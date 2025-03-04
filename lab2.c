@@ -72,6 +72,7 @@ for (col = 0 ; col < 64 ; col++) {
   /* Draw rows of asterisks across the top and bottom of the screen */
   for (col = 0 ; col < 64 ; col++) {
     fbputchar('*', 0, col);
+    fbputchar('-', 15, col);   // Should split the screen
     fbputchar('*', 23, col);
   }
 
