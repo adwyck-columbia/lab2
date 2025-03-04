@@ -69,6 +69,7 @@ int main()
 
 fbclear(0,0,0);
 
+fbputs("This is a long text that will automatically wrap.", 22, 50);
 ////////////////////
   /* Draw rows of asterisks across the top and bottom of the screen */
   for (col = 0 ; col < 64 ; col++) {
