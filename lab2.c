@@ -128,7 +128,7 @@ fbputs("This is a long text that will automatically wrap.", 21, 50);
 
     //  printf("%s\n", keystate);
       printf("%c\n", key);
-      fbputs(keystate, 21, 0);     //TYPES at Row 21?
+      fbputs(key, 21, 0);     //TYPES at Row 21?
       if (packet.keycode[0] == 0x29) { /* ESC pressed? */
 	break;
       }
@@ -173,7 +173,7 @@ int rws = 1;
   return NULL;
 }
 
-///////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////// handling ASCII
 
 char usbkey_to_ascii(uint8_t keycode, uint8_t modifiers)
 {
