@@ -177,7 +177,7 @@ int rws = 1;
     fbputs(recvBuf, rws, 0);
     rws++;
     ////////////////////////////// clear and scroll to top and clear the recieve screen
-    if(rws > 20){
+    if(rws >= 20){
       for (rows = 0 ; rows < 21 ; rows++){
          for (col = 0 ; col < 64 ; col++) {
            fbputchar(' ', rows, col);
