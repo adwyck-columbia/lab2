@@ -62,7 +62,7 @@ int main()
 for (rows = 0 ; rows < 24 ; col++){
 for (col = 0 ; col < 64 ; col++) {
   
-  fbputchar('', rows, col);
+  fbputchar(' ', rows, col);
   //fbputchar('*', 23, col);
 }
 }
