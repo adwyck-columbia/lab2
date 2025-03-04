@@ -26,6 +26,8 @@
 //#define USB_LSHIFT 0x02
 //#define USB_RSHIFT 0x20
 
+#define INPUT_ROW 21
+
 /*
  * References:
  *
@@ -50,6 +52,9 @@ int main()
   /////////////////////added variable
   int rows;
   char key;
+
+  char input_buffer[BUFFER_SIZE];
+  int input_index = 0;
   ////////////////////
 
   struct sockaddr_in serv_addr;
@@ -73,7 +78,7 @@ int main()
 
 fbclear(0,0,0);
 
-fbputs("This is a long text that will automatically wrap.", 21, 50);
+//fbputs("This is a long text that will automatically wrap.", 21, 50);
 ////////////////////
   /* Draw rows of asterisks across the top and bottom of the screen */
   for (col = 0 ; col < 64 ; col++) {
@@ -120,17 +125,9 @@ fbputs("This is a long text that will automatically wrap.", 21, 50);
 			      (unsigned char *) &packet, sizeof(packet),
 			      &transferred, 0);
     if (transferred == sizeof(packet)) {
-      sprintf(keystate, "%02x %02x %02x", packet.modifiers, packet.keycode[0],
-	      packet.keycode[1]);
+     // sprintf(keystate, "%02x %02x %02x", packet.modifiers, packet.keycode[0],
+	   //   packet.keycode[1]);
       
-      // if(packet.keycode[0] == 0 && packet.keycode[1] == 0 && packet.modifiers == 0){
-      //   continue;
-      // }
-      // else{
-      
-      //   key = usbkey_to_ascii(packet.keycode[0], packet.modifiers);
-      // }
-
       if(packet.keycode[0] == 0 && packet.keycode[1] == 0 && packet.modifiers == 0){
         continue;
       }
@@ -143,9 +140,25 @@ fbputs("This is a long text that will automatically wrap.", 21, 50);
         }
       }
 
+      /////////////////////////////////////////////
+        if(key != 0){
+          if(input_index < BUFFER_SIZE -1){  // leave space for '\0'.. What's that?
+            input_buffer[input_index++] = key;
+            input_buffer[input_index] = '\0';
+          }
+
+        }
+
+        for (col = 0; col < 64; col++) {
+          fbputchar(' ', INPUT_ROW, col);
+      }
+      ////////////////////////////////////////////
+
+
     //  printf("%s\n", keystate);
-      printf("%c\n", key);
-      fbputchar(key, 21, 0); 
+      printf("%c\n", key);  //Current
+      fbputs(input_buffer, INPUT_ROW, 0);
+      //fbputchar(key, 21, 0); //Current
     //  fbputs(keystate, 21, 0);     //TYPES at Row 21?
       if (packet.keycode[0] == 0x29) { /* ESC pressed? */
 	break;
@@ -177,8 +190,8 @@ int rws = 1;
     fbputs(recvBuf, rws, 0);
     rws++;
     ////////////////////////////// clear and scroll to top and clear the recieve screen
-    if(rws > 19){
-      for (rows = 0 ; rows < 21 ; rows++){
+    if(rws > 20){
+      for (rows = 0 ; rows < 20 ; rows++){
          for (col = 0 ; col < 64 ; col++) {
            fbputchar(' ', rows, col);
          }
