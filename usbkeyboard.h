@@ -15,6 +15,11 @@
 #define USB_RALT   (1 << 6) 
 #define USB_RGUI   (1 << 7)
 
+//////////////////////////
+char usbkey_to_ascii(uint8_t keycode, uint8_t modifiers);
+
+//////////////////////////
+
 struct usb_keyboard_packet {
   uint8_t modifiers;
   uint8_t reserved;

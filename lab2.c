@@ -23,8 +23,8 @@
 
 #define BUFFER_SIZE 128
 
-#define USB_LSHIFT 0x02
-#define USB_RSHIFT 0x20
+//#define USB_LSHIFT 0x02
+//#define USB_RSHIFT 0x20
 
 /*
  * References:
@@ -175,7 +175,7 @@ int rws = 1;
 
 ///////////////////////////////////////////////////////////////////
 
-char usbkey_to_ascii(int keycode, int modifiers)
+char usbkey_to_ascii(uint8_t keycode, uint8_t modifiers)
 {
     // Letters: keycodes 0x04 to 0x1d represent 'a' to 'z'
     if (keycode >= 0x04 && keycode <= 0x1d) {
