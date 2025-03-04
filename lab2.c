@@ -65,7 +65,7 @@ int main()
 //  fbputchar(' ', rows, col);
   //fbputchar('*', 23, col);
 //}
-}
+//}
 
 
 ////////////////////
