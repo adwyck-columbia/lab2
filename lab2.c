@@ -128,7 +128,8 @@ fbputs("This is a long text that will automatically wrap.", 21, 50);
 
     //  printf("%s\n", keystate);
       printf("%c\n", key);
-      fbputs(key, 21, 0);     //TYPES at Row 21?
+      fbputchar(key, 21, 0); 
+    //  fbputs(keystate, 21, 0);     //TYPES at Row 21?
       if (packet.keycode[0] == 0x29) { /* ESC pressed? */
 	break;
       }
