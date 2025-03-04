@@ -61,7 +61,7 @@ int main()
     fbputchar('*', 23, col);
   }
 
-  fbputs("Hello Adwyck Gupta 123", 4, 10);
+  //fbputs("Hello Adwyck Gupta 123", 4, 10);
 
   /* Open the keyboard */
   if ( (keyboard = openkeyboard(&endpoint_address)) == NULL ) {
