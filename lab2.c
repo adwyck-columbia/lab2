@@ -175,6 +175,7 @@ int rws = 1;
     recvBuf[n] = '\0';
     printf("%s", recvBuf);
     fbputs(recvBuf, rws, 0);
+    rws++;
     ////////////////////////////// clear and scroll to top and clear the recieve screen
     if(rws > 20){
       for (rows = 0 ; rows < 21 ; rows++){
