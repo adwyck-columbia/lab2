@@ -59,14 +59,15 @@ int main()
     exit(1);
   }
 //////////Clear?
-for (rows = 0 ; rows < 24 ; rows++){
-for (col = 0 ; col < 64 ; col++) {
+// for (rows = 0 ; rows < 24 ; rows++){
+// for (col = 0 ; col < 64 ; col++) {
   
-  fbputchar(' ', rows, col);
-  //fbputchar('*', 23, col);
-}
-}
+//   fbputchar(' ', rows, col);
+//   //fbputchar('*', 23, col);
+// }
+// }
 
+fbclear(0,0,0);
 
 ////////////////////
   /* Draw rows of asterisks across the top and bottom of the screen */
@@ -117,7 +118,7 @@ for (col = 0 ; col < 64 ; col++) {
       sprintf(keystate, "%02x %02x %02x", packet.modifiers, packet.keycode[0],
 	      packet.keycode[1]);
       printf("%s\n", keystate);
-      fbputs(keystate, 21, 0);
+      fbputs(keystate, 22, 0);     //TYPES at Row 22?
       if (packet.keycode[0] == 0x29) { /* ESC pressed? */
 	break;
       }

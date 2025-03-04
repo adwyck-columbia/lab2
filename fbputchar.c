@@ -117,6 +117,26 @@ void fbputs(const char *s, int row, int col)
 od --address-radix=n --width=16 -v -t x1 -j 4 -N 2048 lat0-16.psfu
 
 */
+///////////////////////////////////////////////////////////////////ADDED FUNCTIONS
+void fbclear(uint8_t r, uint8_t g, uint8_t b)
+{
+    int x, y;
+    unsigned char *pixel = framebuffer;
+
+    for (y = 0; y < fb_vinfo.yres; y++) {
+        for (x = 0; x < fb_vinfo.xres; x++) {
+            pixel[0] = b;  /* Blue */
+            pixel[1] = g;  /* Green */
+            pixel[2] = r;  /* Red */
+            pixel[3] = 0;  /* Unused */
+            pixel += 4;
+        }
+    }
+}
+
+
+
+//////////////////////////////////////////////////////////////////////
 
 static unsigned char font[] = {
   0x00, 0x00, 0x7e, 0xc3, 0x99, 0x99, 0xf3, 0xe7, 0xe7, 0xff, 0xe7, 0xe7, 0x7e, 0x00, 0x00, 0x00,
