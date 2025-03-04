@@ -118,7 +118,7 @@ od --address-radix=n --width=16 -v -t x1 -j 4 -N 2048 lat0-16.psfu
 
 */
 ///////////////////////////////////////////////////////////////////ADDED FUNCTIONS
-void fbclear(uint8_t r, uint8_t g, uint8_t b)
+void fbclear(int r, int g, int b)
 {
     int x, y;
     unsigned char *pixel = framebuffer;
