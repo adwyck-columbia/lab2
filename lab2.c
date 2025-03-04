@@ -123,11 +123,19 @@ fbputs("This is a long text that will automatically wrap.", 21, 50);
       sprintf(keystate, "%02x %02x %02x", packet.modifiers, packet.keycode[0],
 	      packet.keycode[1]);
       
-      if(packet.keycode[0] == 0 && packet.keycode[1] == 0 && packet.modifiers == 0){
+      // if(packet.keycode[0] == 0 && packet.keycode[1] == 0 && packet.modifiers == 0){
+      //   continue;
+      // }
+      // else{
+      
+      //   key = usbkey_to_ascii(packet.keycode[0], packet.modifiers);
+      // }
+
+      if(packet.keycode[0] == 0 && packet.modifiers == 0){
         continue;
       }
       else{
-      key = usbkey_to_ascii(packet.keycode[0], packet.modifiers);
+        key = usbkey_to_ascii(packet.keycode[0], packet.modifiers);
       }
 
     //  printf("%s\n", keystate);
