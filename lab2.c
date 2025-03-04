@@ -135,7 +135,7 @@ fbputs("This is a long text that will automatically wrap.", 21, 50);
         continue;
       }
       else{
-        if( packet.modifier != 0 && packet.keycode[0] == 0){
+        if( packet.modifiers != 0 && packet.keycode[0] == 0){
           continue;
         }
         else{
