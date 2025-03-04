@@ -111,45 +111,45 @@ void fbputchar(char c, int row, int col)
  * Draw the given string at the given row/column.
  * String must fit on a single line: wrap-around is not handled.
  */
-// void fbputs(const char *s, int row, int col)
-// {
-//   char c;
-//   while ((c = *s++) != 0) fbputchar(c, row, col++);
-// }
-
 void fbputs(const char *s, int row, int col)
 {
-    char c;
-    while ((c = *s++) != 0) {
-        fbputchar(c, row, col++);  // Print character
-
-        // Check if we reached the last column
-        if (col >= MAX_COLS) {
-            col = 0;  // Move to first column
-            row++;    // Move to the next row
-
-            // If we reach the last row, scroll up
-            if (row >= MAX_ROWS) {
-                fbscroll(1, MAX_ROWS - 1);  // Scroll text area (rows 1-23)
-                row = MAX_ROWS - 1;  // Keep writing at the last row
-            }
-        }
-    }
+  char c;
+  while ((c = *s++) != 0) fbputchar(c, row, col++);
 }
 
-void fbscroll(int start_row, int end_row)
-{
-    int height = (end_row - start_row) * FONT_HEIGHT * 2;
-    unsigned char *src = framebuffer + (start_row + 1) * FONT_HEIGHT * 2 * fb_finfo.line_length;
-    unsigned char *dest = framebuffer + start_row * FONT_HEIGHT * 2 * fb_finfo.line_length;
+// void fbputs(const char *s, int row, int col)
+// {
+//     char c;
+//     while ((c = *s++) != 0) {
+//         fbputchar(c, row, col++);  // Print character
 
-    // Move the lines up (overwrite previous rows)
-    memmove(dest, src, height * fb_finfo.line_length);
+//         // Check if we reached the last column
+//         if (col >= MAX_COLS) {
+//             col = 0;  // Move to first column
+//             row++;    // Move to the next row
 
-    // Clear the last row after scrolling
-    unsigned char *last_row = framebuffer + end_row * FONT_HEIGHT * 2 * fb_finfo.line_length;
-    memset(last_row, 0, FONT_HEIGHT * 2 * fb_finfo.line_length);
-}
+//             // If we reach the last row, scroll up
+//             if (row >= MAX_ROWS) {
+//                 fbscroll(1, MAX_ROWS - 1);  // Scroll text area (rows 1-23)
+//                 row = MAX_ROWS - 1;  // Keep writing at the last row
+//             }
+//         }
+//     }
+// }
+
+// void fbscroll(int start_row, int end_row)
+// {
+//     int height = (end_row - start_row) * FONT_HEIGHT * 2;
+//     unsigned char *src = framebuffer + (start_row + 1) * FONT_HEIGHT * 2 * fb_finfo.line_length;
+//     unsigned char *dest = framebuffer + start_row * FONT_HEIGHT * 2 * fb_finfo.line_length;
+
+//     // Move the lines up (overwrite previous rows)
+//     memmove(dest, src, height * fb_finfo.line_length);
+
+//     // Clear the last row after scrolling
+//     unsigned char *last_row = framebuffer + end_row * FONT_HEIGHT * 2 * fb_finfo.line_length;
+//     memset(last_row, 0, FONT_HEIGHT * 2 * fb_finfo.line_length);
+// }
 /* 8 X 16 console font from /lib/kbd/consolefonts/lat0-16.psfu.gz
 
 od --address-radix=n --width=16 -v -t x1 -j 4 -N 2048 lat0-16.psfu
