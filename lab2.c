@@ -44,6 +44,10 @@ int main()
 {
   int err, col;
 
+  /////////////////////added variable
+  int rows;
+  ////////////////////
+
   struct sockaddr_in serv_addr;
 
   struct usb_keyboard_packet packet;
@@ -54,7 +58,17 @@ int main()
     fprintf(stderr, "Error: Could not open framebuffer: %d\n", err);
     exit(1);
   }
+//////////Clear?
+for (rows = 0 ; rows < 24 ; col++){
+for (col = 0 ; col < 64 ; col++) {
+  
+  fbputchar('', rows, col);
+  //fbputchar('*', 23, col);
+}
+}
 
+
+////////////////////
   /* Draw rows of asterisks across the top and bottom of the screen */
   for (col = 0 ; col < 64 ; col++) {
     fbputchar('*', 0, col);
