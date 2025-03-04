@@ -111,31 +111,31 @@ void fbputchar(char c, int row, int col)
  * Draw the given string at the given row/column.
  * String must fit on a single line: wrap-around is not handled.
  */
-void fbputs(const char *s, int row, int col)
-{
-  char c;
-  while ((c = *s++) != 0) fbputchar(c, row, col++);
-}
-
 // void fbputs(const char *s, int row, int col)
 // {
-//     char c;
-//     while ((c = *s++) != 0) {
-//         fbputchar(c, row, col++);  // Print character
-
-//         // Check if we reached the last column
-//         if (col >= MAX_COLS) {
-//             col = 0;  // Move to first column
-//             row++;    // Move to the next row
-
-//             // If we reach the last row, scroll up
-//             if (row >= MAX_ROWS) {
-//                 fbscroll(1, MAX_ROWS - 1);  // Scroll text area (rows 1-23)
-//                 row = MAX_ROWS - 1;  // Keep writing at the last row
-//             }
-//         }
-//     }
+//   char c;
+//   while ((c = *s++) != 0) fbputchar(c, row, col++);
 // }
+
+ void fbputs(const char *s, int row, int col)
+{
+    char c;
+    while ((c = *s++) != 0) {
+        fbputchar(c, row, col++);  // Print character
+
+        // Check if we reached the last column
+        if (col >= MAX_COLS) {
+            col = 0;  // Move to first column
+            row++;    // Move to the next row
+
+            // If we reach the last row, scroll up
+            // if (row >= MAX_ROWS) {
+            //     fbscroll(1, MAX_ROWS - 1);  // Scroll text area (rows 1-23)
+            //     row = MAX_ROWS - 1;  // Keep writing at the last row
+            // }
+        }
+    }
+}
 
 // void fbscroll(int start_row, int end_row)
 // {
