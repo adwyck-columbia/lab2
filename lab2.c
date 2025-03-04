@@ -23,6 +23,9 @@
 
 #define BUFFER_SIZE 128
 
+#define USB_LSHIFT 0x02
+#define USB_RSHIFT 0x20
+
 /*
  * References:
  *
@@ -46,6 +49,7 @@ int main()
 
   /////////////////////added variable
   int rows;
+  char key;
   ////////////////////
 
   struct sockaddr_in serv_addr;
@@ -118,7 +122,12 @@ fbputs("This is a long text that will automatically wrap.", 21, 50);
     if (transferred == sizeof(packet)) {
       sprintf(keystate, "%02x %02x %02x", packet.modifiers, packet.keycode[0],
 	      packet.keycode[1]);
-      printf("%s\n", keystate);
+
+      key = usbkey_to_ascii(packet.keycode[0], packet.modifiers);
+
+
+    //  printf("%s\n", keystate);
+      printf("%c\n", key);
       fbputs(keystate, 21, 0);     //TYPES at Row 21?
       if (packet.keycode[0] == 0x29) { /* ESC pressed? */
 	break;
@@ -148,7 +157,7 @@ int rws = 1;
     recvBuf[n] = '\0';
     printf("%s", recvBuf);
     fbputs(recvBuf, rws, 0);
-    //////////////////////////////
+    ////////////////////////////// clear and scroll to top and clear the recieve screen
     if(rws > 20){
       for (rows = 0 ; rows < 21 ; rows++){
          for (col = 0 ; col < 64 ; col++) {
@@ -164,3 +173,81 @@ int rws = 1;
   return NULL;
 }
 
+///////////////////////////////////////////////////////////////////
+
+char usbkey_to_ascii(uint8_t keycode, uint8_t modifiers)
+{
+    // Letters: keycodes 0x04 to 0x1d represent 'a' to 'z'
+    if (keycode >= 0x04 && keycode <= 0x1d) {
+        if (modifiers & (USB_LSHIFT | USB_RSHIFT))
+            return 'A' + (keycode - 0x04);
+        else
+            return 'a' + (keycode - 0x04);
+    }
+
+    // Digits: keycodes 0x1e to 0x27 represent '1'-'9' and '0'
+    if (keycode >= 0x1e && keycode <= 0x27) {
+        if (modifiers & (USB_LSHIFT | USB_RSHIFT)) {
+            // When shifted, map to symbols
+            const char shifted_digits[] = {'!', '@', '#', '$', '%', '^', '&', '*', '(', ')'};
+            return shifted_digits[keycode - 0x1e];
+        } else {
+            // Not shifted: map normally
+            if (keycode == 0x27)
+                return '0';
+            else
+                return '1' + (keycode - 0x1e);
+        }
+    }
+
+    // Space: keycode 0x2c
+    if (keycode == 0x2c)
+        return ' ';
+
+    // Punctuation and symbols:
+    if (keycode == 0x2d) {  // '-' or '_'
+        return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? '_' : '-';
+    }
+    if (keycode == 0x2e) {  // '=' or '+'
+        return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? '+' : '=';
+    }
+    if (keycode == 0x2f) {  // '[' or '{'
+        return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? '{' : '[';
+    }
+    if (keycode == 0x30) {  // ']' or '}'
+        return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? '}' : ']';
+    }
+    if (keycode == 0x31) {  // '\' or '|'
+        return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? '|' : '\\';
+    }
+    if (keycode == 0x33) {  // ';' or ':'
+        return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? ':' : ';';
+    }
+    if (keycode == 0x34) {  // '\'' or '"'
+        return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? '"' : '\'';
+    }
+    if (keycode == 0x35) {  // '`' or '~'
+        return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? '~' : '`';
+    }
+    if (keycode == 0x36) {  // ',' or '<'
+        return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? '<' : ',';
+    }
+    if (keycode == 0x37) {  // '.' or '>'
+        return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? '>' : '.';
+    }
+    if (keycode == 0x38) {  // '/' or '?'
+        return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? '?' : '/';
+    }
+
+    // Backspace: keycode 0x2a
+    if (keycode == 0x2a)
+        return '\b';
+
+    // Enter: keycode 0x28
+    if (keycode == 0x28)
+        return '\n';
+
+    // For keys not mapped here, return 0.
+    return 0;
+}
+////////////////////////////////////////////////////////////////////////////////////////
