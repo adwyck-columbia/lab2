@@ -140,7 +140,7 @@ void *network_thread_f(void *ignored)
   char recvBuf[BUFFER_SIZE];
   int n;
   /////////////////////
-  int rows, cols;
+  int rows, col;
 int rws = 1;
   ////////////////////
   /* Receive data */
