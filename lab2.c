@@ -131,11 +131,16 @@ fbputs("This is a long text that will automatically wrap.", 21, 50);
       //   key = usbkey_to_ascii(packet.keycode[0], packet.modifiers);
       // }
 
-      if(packet.keycode[0] == 0 && packet.modifiers == 0){
+      if(packet.keycode[0] == 0 && packet.keycode[1] == 0 && packet.modifiers == 0){
         continue;
       }
       else{
+        if( packet.modifier != 0 && packet.keycode[0] == 0){
+          continue;
+        }
+        else{
         key = usbkey_to_ascii(packet.keycode[0], packet.modifiers);
+        }
       }
 
     //  printf("%s\n", keystate);
