@@ -119,7 +119,7 @@ fbputs("This is a long text that will automatically wrap.", 21, 50);
       sprintf(keystate, "%02x %02x %02x", packet.modifiers, packet.keycode[0],
 	      packet.keycode[1]);
       printf("%s\n", keystate);
-      fbputs(keystate, 22, 0);     //TYPES at Row 22?
+      fbputs(keystate, 21, 0);     //TYPES at Row 22?
       if (packet.keycode[0] == 0x29) { /* ESC pressed? */
 	break;
       }
