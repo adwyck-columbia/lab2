@@ -119,7 +119,7 @@ fbputs("This is a long text that will automatically wrap.", 21, 50);
       sprintf(keystate, "%02x %02x %02x", packet.modifiers, packet.keycode[0],
 	      packet.keycode[1]);
       printf("%s\n", keystate);
-      fbputs(keystate, 21, 0);     //TYPES at Row 22?
+      fbputs(keystate, 21, 0);     //TYPES at Row 21?
       if (packet.keycode[0] == 0x29) { /* ESC pressed? */
 	break;
       }
@@ -139,11 +139,25 @@ void *network_thread_f(void *ignored)
 {
   char recvBuf[BUFFER_SIZE];
   int n;
+  /////////////////////
+int rws = 1;
+  ////////////////////
   /* Receive data */
   while ( (n = read(sockfd, &recvBuf, BUFFER_SIZE - 1)) > 0 ) {
     recvBuf[n] = '\0';
     printf("%s", recvBuf);
-    fbputs(recvBuf, 1, 0);
+    fbputs(recvBuf, rws, 0);
+    //////////////////////////////
+    if(rws > 20){
+      for (rows = 0 ; rows < 21 ; rows++){
+         for (col = 0 ; col < 64 ; col++) {
+           fbputchar(' ', rows, col);
+         }
+         }
+      rws = 1;
+
+    }
+    //////////////////////////
   }
 
   return NULL;
