@@ -74,7 +74,7 @@ fbputs("This is a long text that will automatically wrap.", 21, 50);
   /* Draw rows of asterisks across the top and bottom of the screen */
   for (col = 0 ; col < 64 ; col++) {
     fbputchar('*', 0, col);
-    fbputchar('-', 21, col);   // Should split the screen
+    fbputchar('-', 20, col);   // Should split the screen
     fbputchar('*', 23, col);
   }
 
