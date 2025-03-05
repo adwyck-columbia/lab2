@@ -172,7 +172,7 @@ fbclear(0,0,0);
               }
           } 
           
-          if (key == '\n') { // Enter
+          else if (key == '\n') { // Enter
                 
             write(sockfd, input_buffer, strlen(input_buffer));
 
