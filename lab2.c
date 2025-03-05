@@ -170,27 +170,9 @@ fbclear(0,0,0);
                   cursor_position--;  // Move the cursor back one position
                   input_buffer[input_index] = '\0';  // Maintain null termination
               }
-
-          }
+              
           
-          if (packet.keycode[0] == 0x28) { // Enter
-                
-            write(sockfd, input_buffer, strlen(input_buffer));
-
-             // Clear the input area (both rows)
-              for (col = 0; col < MAX_COLS; col++) {
-                fbputchar(' ', INPUT_FIRST_ROW, col);
-                fbputchar(' ', INPUT_SECOND_ROW, col);
-               }
-
-               // Reset buffer and positions
-
-              input_index = 0;
-              cursor_position = 0;
-              input_buffer[0] = '\0';
-            }
-            
-          else {
+          } else {
               // Insert the character at the current cursor position
               if (input_index < BUFFER_SIZE - 1) {  // Leave room for '\0'
                   // Shift characters to the right, starting at the current cursor position
@@ -214,8 +196,7 @@ fbclear(0,0,0);
 
 
     //  printf("%s\n", keystate);
-     // printf("%c\n", key);  //Current
-     printf("Key: %c, Buffer: \"%s\"\n", key, input_buffer);
+      printf("%c\n", key);  //Current
       ///////////////////////////////////////
       for (col = 0; col < MAX_COLS; col++) {
         fbputchar(' ', INPUT_FIRST_ROW, col);
@@ -359,7 +340,7 @@ char usbkey_to_ascii(uint8_t keycode, uint8_t modifiers)
     }
     // Enter: keycode 0x28
     if (keycode == 0x28){
-      return 0;
+      return '\n';
     }
     // For keys not mapped here, return 0.
     return 0;
