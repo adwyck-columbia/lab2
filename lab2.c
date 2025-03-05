@@ -187,7 +187,6 @@ fbclear(0,0,0);
               input_index = 0;
               cursor_position = 0;
               input_buffer[0] = '\0';
-              continue;
             }
 
           else {
