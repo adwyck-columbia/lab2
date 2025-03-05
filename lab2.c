@@ -157,8 +157,9 @@ fbclear(0,0,0);
 
         // }
 
-        if (key != 0) {
-          if (key == '\b') {
+        if (key != 0) {                     //If key pressed
+
+          if (key == '\b') { // BACKSPACE
               // Backspace: Remove the character before the cursor, if any.
               if (cursor_position > 0) {
                   // Shift left all characters from cursor_position to the end.
@@ -169,6 +170,12 @@ fbclear(0,0,0);
                   cursor_position--;  // Move the cursor back one position
                   input_buffer[input_index] = '\0';  // Maintain null termination
               }
+
+              if (key == '\n') { // Enter
+                // Clear the display
+                fbclear_part(21,22);
+                }
+          
           } else {
               // Insert the character at the current cursor position
               if (input_index < BUFFER_SIZE - 1) {  // Leave room for '\0'
@@ -337,7 +344,7 @@ char usbkey_to_ascii(uint8_t keycode, uint8_t modifiers)
     }
     // Enter: keycode 0x28
     if (keycode == 0x28){
-      return 0;
+      return '\n';
     }
     // For keys not mapped here, return 0.
     return 0;

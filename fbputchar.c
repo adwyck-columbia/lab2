@@ -172,6 +172,23 @@ void fbclear(int r, int g, int b)
     }
 }
 
+void fbclear_part(int x, int y)
+{
+
+    int rows, cols;
+    unsigned char *pixel = framebuffer;
+
+    for (rows = x; rows < y+1; rows++) {
+        for (cols = 0; cols < 63; cols++) {
+            pixel[0] = b;  /* Blue */
+            pixel[1] = g;  /* Green */
+            pixel[2] = r;  /* Red */
+            pixel[3] = 0;  /* Unused */
+            pixel += 4;
+        }
+    }
+}
+
 
 /////////////////////////////////////////
 void fbscroll(int start_row, int end_row)
