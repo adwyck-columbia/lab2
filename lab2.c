@@ -26,7 +26,9 @@
 //#define USB_LSHIFT 0x02
 //#define USB_RSHIFT 0x20
 
-#define INPUT_ROW 21
+#define INPUT_FIRST_ROW 21
+#define INPUT_SECOND_ROW 22
+#define MAX_COLS 64
 //#define CURSOR_CHAR '|'
 
 /*
@@ -162,10 +164,30 @@ fbclear(0,0,0);
 
     //  printf("%s\n", keystate);
       printf("%c\n", key);  //Current
-
+      ///////////////////////////////////////
+      for (col = 0; col < MAX_COLS; col++) {
+        fbputchar(' ', INPUT_FIRST_ROW, col);
+        fbputchar(' ', INPUT_SECOND_ROW, col);
+    }
+    
+    if (input_index < MAX_COLS) {
+        // If the input fits on the first row, display it there
+        fbputs(input_buffer, INPUT_FIRST_ROW, 0);
+        // Display the cursor at the next column on the first row
+        fbputchar('|', INPUT_FIRST_ROW, input_index);
+    } else {
+        // If the input exceeds one row, split it:
+        // Display the first MAX_COLS characters on the first row
+        fbputs(input_buffer, INPUT_FIRST_ROW, 0);
+        // Display the remaining characters on the second row
+        fbputs(input_buffer + MAX_COLS, INPUT_SECOND_ROW, 0);
+        // Display the cursor on the second row at position (input_index - MAX_COLS)
+        fbputchar('|', INPUT_SECOND_ROW, input_index - MAX_COLS);
+    }
+      ///////////////////////////////////////
       ///////
-      fbputs(input_buffer, INPUT_ROW, 0);
-      fbputchar('|', INPUT_ROW, input_index);
+      //fbputs(input_buffer, INPUT_ROW, 0);
+      //fbputchar('|', INPUT_ROW, input_index);
       //fbputchar(key, 21, 0); //Current
     //  fbputs(keystate, 21, 0);     //TYPES at Row 21?
       if (packet.keycode[0] == 0x29) { /* ESC pressed? */
