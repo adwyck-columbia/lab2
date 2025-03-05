@@ -29,7 +29,7 @@
 #define INPUT_FIRST_ROW 21
 #define INPUT_SECOND_ROW 22
 #define MAX_COLS 64
-#define CURSOR_CHAR '\n'
+#define CURSOR_CHAR '|'
 
 /*
  * References:
