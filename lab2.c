@@ -29,7 +29,7 @@
 #define INPUT_FIRST_ROW 21
 #define INPUT_SECOND_ROW 22
 #define MAX_COLS 64
-//#define CURSOR_CHAR '|'
+//#define CURSOR_CHAR '\n'
 
 /*
  * References:
@@ -303,11 +303,11 @@ char usbkey_to_ascii(uint8_t keycode, uint8_t modifiers)
 
     // Backspace: keycode 0x2a
     if (keycode == 0x2a)
-        return '\b';
+        continue;
 
     // Enter: keycode 0x28
     if (keycode == 0x28)
-        return '\n';
+        continue;
 
     // For keys not mapped here, return 0.
     return 0;
