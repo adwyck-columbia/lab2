@@ -213,7 +213,9 @@ fbclear(0,0,0);
 
 
     //  printf("%s\n", keystate);
-      printf("%c\n", key);  //Current
+    //  printf("%c\n", key);  //Current
+
+    printf("Key: %c, Buffer: \"%s\"\n", key, input_buffer);
       ///////////////////////////////////////
       for (col = 0; col < MAX_COLS; col++) {
         fbputchar(' ', INPUT_FIRST_ROW, col);
