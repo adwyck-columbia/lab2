@@ -27,7 +27,7 @@
 //#define USB_RSHIFT 0x20
 
 #define INPUT_ROW 21
-#define CURSOR_CHAR '|'
+//#define CURSOR_CHAR '|'
 
 /*
  * References:
@@ -125,9 +125,6 @@ fbclear(0,0,0);
   /* Look for and handle keypresses */
   input_buffer[0] = '\0';
 
-  //////////////// Display initial char
-  fbputchar(CURSOR_CHAR, INPUT_ROW, cursor_col);
-
   for (;;) {
     libusb_interrupt_transfer(keyboard, endpoint_address,
 			      (unsigned char *) &packet, sizeof(packet),
@@ -157,14 +154,10 @@ fbclear(0,0,0);
 
         }
 
-   //     for (col = 0; col < 64; col++) {
-   //       fbputchar(' ', INPUT_ROW, col);
-   //   }
+        for (col = 0; col < 64; col++) {
+          fbputchar(' ', INPUT_ROW, col);
+      }
       ////////////////////////////////////////////
-      fbputchar(' ', INPUT_ROW, cursor_col);
-      ///////////Cursor thing
-
-      ////////////////////
 
 
     //  printf("%s\n", keystate);
@@ -172,14 +165,7 @@ fbclear(0,0,0);
 
       ///////
       fbputs(input_buffer, INPUT_ROW, 0);
-      //////////////////////////////////////////
-      cursor_col = input_index % 64; // Wraps within row
-      if (cursor_col == 0 && input_index > 0) {
-          fbscroll(21, 22); // Scroll input area if it overflows
-      }
-
-      fbputchar(CURSOR_CHAR, INPUT_ROW, cursor_col);
-      //////////////////////////////////////////
+      fbputchar('|', INPUT_ROW, input_index);
       //fbputchar(key, 21, 0); //Current
     //  fbputs(keystate, 21, 0);     //TYPES at Row 21?
       if (packet.keycode[0] == 0x29) { /* ESC pressed? */
