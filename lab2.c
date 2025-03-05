@@ -171,24 +171,26 @@ fbclear(0,0,0);
                   input_buffer[input_index] = '\0';  // Maintain null termination
               }
 
-              if (packet.keycode[0] == 0x28) { // Enter
-                
-                write(sockfd, input_buffer, strlen(input_buffer));
-
-                 // Clear the input area (both rows)
-                  for (col = 0; col < MAX_COLS; col++) {
-                    fbputchar(' ', INPUT_FIRST_ROW, col);
-                    fbputchar(' ', INPUT_SECOND_ROW, col);
-                   }
-
-                   // Reset buffer and positions
-
-                  input_index = 0;
-                  cursor_position = 0;
-                  input_buffer[0] = '\0';
-                }
+          }
           
-          } else {
+          if (packet.keycode[0] == 0x28) { // Enter
+                
+            write(sockfd, input_buffer, strlen(input_buffer));
+
+             // Clear the input area (both rows)
+              for (col = 0; col < MAX_COLS; col++) {
+                fbputchar(' ', INPUT_FIRST_ROW, col);
+                fbputchar(' ', INPUT_SECOND_ROW, col);
+               }
+
+               // Reset buffer and positions
+
+              input_index = 0;
+              cursor_position = 0;
+              input_buffer[0] = '\0';
+            }
+            
+          else {
               // Insert the character at the current cursor position
               if (input_index < BUFFER_SIZE - 1) {  // Leave room for '\0'
                   // Shift characters to the right, starting at the current cursor position
