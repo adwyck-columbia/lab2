@@ -172,8 +172,20 @@ fbclear(0,0,0);
               }
 
               if (key == '\n') { // Enter
-                // Clear the display
-                fbclear_part(21,22);
+                
+                write(sockfd, input_buffer, strlen(input_buffer));
+
+                 // Clear the input area (both rows)
+                  for (col = 0; col < MAX_COLS; col++) {
+                    fbputchar(' ', INPUT_FIRST_ROW, col);
+                    fbputchar(' ', INPUT_SECOND_ROW, col);
+                   }
+
+                   // Reset buffer and positions
+
+                  input_index = 0;
+                  cursor_position = 0;
+                  input_buffer[0] = '\0';
                 }
           
           } else {
@@ -200,7 +212,8 @@ fbclear(0,0,0);
 
 
     //  printf("%s\n", keystate);
-      printf("%c\n", key);  //Current
+     // printf("%c\n", key);  //Current
+     printf("Key: %c, Buffer: \"%s\"\n", key, input_buffer);
       ///////////////////////////////////////
       for (col = 0; col < MAX_COLS; col++) {
         fbputchar(' ', INPUT_FIRST_ROW, col);
