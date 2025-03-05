@@ -58,6 +58,7 @@ int main()
 
   char input_buffer[BUFFER_SIZE];
   int input_index = 0;
+  int cursor_position = 0;
 
   int cursor_col = 0;
   ////////////////////
@@ -148,13 +149,42 @@ fbclear(0,0,0);
       }
 
       /////////////////////////////////////////////
-        if(key != 0){
-          if(input_index < BUFFER_SIZE -1){  // leave space for '\0'.. What's that?
-            input_buffer[input_index++] = key;
-            input_buffer[input_index] = '\0';
-          }
+        // if(key != 0){
+        //   if(input_index < BUFFER_SIZE -1){  // leave space for '\0'.. What's that?
+        //     input_buffer[input_index++] = key;
+        //     input_buffer[input_index] = '\0';
+        //   }
 
-        }
+        // }
+
+        if (key != 0) {
+          if (key == '\b') {
+              // Backspace: Remove the character before the cursor, if any.
+              if (cursor_position > 0) {
+                  // Shift left all characters from cursor_position to the end.
+                  for (int i = cursor_position - 1; i < input_length - 1; i++) {
+                      input_buffer[i] = input_buffer[i + 1];
+                  }
+                  input_length--;
+                  cursor_position--;  // Move the cursor back one position
+                  input_buffer[input_length] = '\0';  // Maintain null termination
+              }
+          } else {
+              // Insert the character at the current cursor position
+              if (input_length < BUFFER_SIZE - 1) {  // Leave room for '\0'
+                  // Shift characters to the right, starting at the current cursor position
+                  for (int i = input_length; i > cursor_position; i--) {
+                      input_buffer[i] = input_buffer[i - 1];
+                  }
+                  input_buffer[cursor_position] = key;  // Insert the new key
+                  input_length++;
+                  cursor_position++;  // Advance the cursor position
+                  input_buffer[input_length] = '\0';  // Update null termination
+              }
+          }
+      }
+
+
 
     //    for (col = 0; col < 64; col++) {
     //      fbputchar(' ', INPUT_ROW, col);
@@ -303,7 +333,7 @@ char usbkey_to_ascii(uint8_t keycode, uint8_t modifiers)
 
     // Backspace: keycode 0x2a
     if (keycode == 0x2a){
-      return 0;
+      return '\b'
     }
     // Enter: keycode 0x28
     if (keycode == 0x28){
