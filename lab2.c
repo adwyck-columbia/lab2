@@ -171,7 +171,7 @@ fbclear(0,0,0);
                   input_buffer[input_index] = '\0';  // Maintain null termination
               }
 
-              if (key == '\n') { // Enter
+              if (packet.keycode[0] == 0x28) { // Enter
                 
                 write(sockfd, input_buffer, strlen(input_buffer));
 
@@ -357,7 +357,7 @@ char usbkey_to_ascii(uint8_t keycode, uint8_t modifiers)
     }
     // Enter: keycode 0x28
     if (keycode == 0x28){
-      return '\n';
+      return 0;
     }
     // For keys not mapped here, return 0.
     return 0;
