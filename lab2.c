@@ -172,22 +172,22 @@ fbclear(0,0,0);
               }
           } 
           
-          if (key == '\n') { // Enter
+          // if (key == '\n') { // Enter
                 
-            write(sockfd, input_buffer, strlen(input_buffer));
+          //   write(sockfd, input_buffer, strlen(input_buffer));
 
-             // Clear the input area (both rows)
-              for (col = 0; col < MAX_COLS; col++) {
-                fbputchar(' ', INPUT_FIRST_ROW, col);
-                fbputchar(' ', INPUT_SECOND_ROW, col);
-               }
+          //    // Clear the input area (both rows)
+          //     for (col = 0; col < MAX_COLS; col++) {
+          //       fbputchar(' ', INPUT_FIRST_ROW, col);
+          //       fbputchar(' ', INPUT_SECOND_ROW, col);
+          //      }
 
-               // Reset buffer and positions
+          //      // Reset buffer and positions
 
-              input_index = 0;
-              cursor_position = 0;
-              input_buffer[0] = '\0';
-            }
+          //     input_index = 0;
+          //     cursor_position = 0;
+          //     input_buffer[0] = '\0';
+          //   }
 
           else {
               // Insert the character at the current cursor position
