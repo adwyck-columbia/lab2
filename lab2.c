@@ -162,24 +162,24 @@ fbclear(0,0,0);
               // Backspace: Remove the character before the cursor, if any.
               if (cursor_position > 0) {
                   // Shift left all characters from cursor_position to the end.
-                  for (int i = cursor_position - 1; i < input_length - 1; i++) {
+                  for (int i = cursor_position - 1; i < input_index - 1; i++) {
                       input_buffer[i] = input_buffer[i + 1];
                   }
-                  input_length--;
+                  input_index--;
                   cursor_position--;  // Move the cursor back one position
-                  input_buffer[input_length] = '\0';  // Maintain null termination
+                  input_buffer[input_index] = '\0';  // Maintain null termination
               }
           } else {
               // Insert the character at the current cursor position
-              if (input_length < BUFFER_SIZE - 1) {  // Leave room for '\0'
+              if (input_index < BUFFER_SIZE - 1) {  // Leave room for '\0'
                   // Shift characters to the right, starting at the current cursor position
-                  for (int i = input_length; i > cursor_position; i--) {
+                  for (int i = input_index; i > cursor_position; i--) {
                       input_buffer[i] = input_buffer[i - 1];
                   }
                   input_buffer[cursor_position] = key;  // Insert the new key
-                  input_length++;
+                  input_index++;
                   cursor_position++;  // Advance the cursor position
-                  input_buffer[input_length] = '\0';  // Update null termination
+                  input_buffer[input_index] = '\0';  // Update null termination
               }
           }
       }
@@ -333,7 +333,7 @@ char usbkey_to_ascii(uint8_t keycode, uint8_t modifiers)
 
     // Backspace: keycode 0x2a
     if (keycode == 0x2a){
-      return '\b'
+      return '\b';
     }
     // Enter: keycode 0x28
     if (keycode == 0x28){
