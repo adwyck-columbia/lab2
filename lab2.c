@@ -303,11 +303,11 @@ char usbkey_to_ascii(uint8_t keycode, uint8_t modifiers)
 
     // Backspace: keycode 0x2a
     if (keycode == 0x2a){
-        continue;
+      return 0;
     }
     // Enter: keycode 0x28
     if (keycode == 0x28){
-        continue;
+      return 0;
     }
     // For keys not mapped here, return 0.
     return 0;
