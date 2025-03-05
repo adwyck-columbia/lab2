@@ -154,9 +154,9 @@ fbclear(0,0,0);
 
         }
 
-        for (col = 0; col < 64; col++) {
-          fbputchar(' ', INPUT_ROW, col);
-      }
+    //    for (col = 0; col < 64; col++) {
+    //      fbputchar(' ', INPUT_ROW, col);
+    //  }
       ////////////////////////////////////////////
 
 
