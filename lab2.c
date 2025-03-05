@@ -221,7 +221,7 @@ int rws = 1;
     rws++;
     ////////////////////////////// clear and scroll to top and clear the recieve screen
     if(rws > 19){
-      for (rows = 0 ; rows < 20 ; rows++){
+      for (rows = 1 ; rows < 20 ; rows++){
          for (col = 0 ; col < 64 ; col++) {
            fbputchar(' ', rows, col);
          }
