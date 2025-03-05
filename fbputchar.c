@@ -180,9 +180,9 @@ void fbclear_part(int x, int y)
 
     for (rows = x; rows < y+1; rows++) {
         for (cols = 0; cols < 63; cols++) {
-            pixel[0] = b;  /* Blue */
-            pixel[1] = g;  /* Green */
-            pixel[2] = r;  /* Red */
+            pixel[0] = 0;  /* Blue */
+            pixel[1] = 0;  /* Green */
+            pixel[2] = 0;  /* Red */
             pixel[3] = 0;  /* Unused */
             pixel += 4;
         }
