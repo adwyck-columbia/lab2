@@ -173,7 +173,21 @@ void fbclear(int r, int g, int b)
 }
 
 
+/////////////////////////////////////////
+void fbscroll(int start_row, int end_row)
+{
+    int row_size = fb_finfo.line_length * FONT_HEIGHT;  // Bytes per row
+    unsigned char *start_addr = framebuffer + 
+        (start_row * FONT_HEIGHT * fb_finfo.line_length);
+    unsigned char *end_addr = framebuffer + 
+        (end_row * FONT_HEIGHT * fb_finfo.line_length);
 
+    // Move all rows up by one row size
+    memcpy(start_addr, start_addr + row_size, (end_row - start_row) * row_size);
+
+    // Clear the last row
+    memset(end_addr - row_size, 0, row_size);
+}
 //////////////////////////////////////////////////////////////////////
 
 static unsigned char font[] = {

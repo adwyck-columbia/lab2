@@ -157,6 +157,8 @@ fbclear(0,0,0);
 
     //  printf("%s\n", keystate);
       printf("%c\n", key);  //Current
+
+      ///////
       fbputs(input_buffer, INPUT_ROW, 0);
       //fbputchar(key, 21, 0); //Current
     //  fbputs(keystate, 21, 0);     //TYPES at Row 21?
