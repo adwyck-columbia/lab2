@@ -23,17 +23,6 @@
 
 #define BUFFER_SIZE 128
 
-//#define USB_LSHIFT 0x02
-//#define USB_RSHIFT 0x20
-
-#define INPUT_FIRST_ROW 21
-#define INPUT_SECOND_ROW 22
-#define MAX_COLS 64
-#define CURSOR_CHAR '|'
-
-#define LEFT_KEY -2
-#define RIGHT_KEY -3
-
 /*
  * References:
  *
@@ -57,13 +46,6 @@ int main()
 
   /////////////////////added variable
   int rows;
-  int key;
-
-  char input_buffer[BUFFER_SIZE];
-  int input_index = 0;
-  int cursor_position = 0;
-
-  int cursor_col = 0;
   ////////////////////
 
   struct sockaddr_in serv_addr;
@@ -87,7 +69,7 @@ int main()
 
 fbclear(0,0,0);
 
-//fbputs("This is a long text that will automatically wrap.", 21, 50);
+fbputs("This is a long text that will automatically wrap.", 21, 50);
 ////////////////////
   /* Draw rows of asterisks across the top and bottom of the screen */
   for (col = 0 ; col < 64 ; col++) {
@@ -129,190 +111,15 @@ fbclear(0,0,0);
   pthread_create(&network_thread, NULL, network_thread_f, NULL);
 
   /* Look for and handle keypresses */
-  input_buffer[0] = '\0';
-
   for (;;) {
     libusb_interrupt_transfer(keyboard, endpoint_address,
 			      (unsigned char *) &packet, sizeof(packet),
 			      &transferred, 0);
     if (transferred == sizeof(packet)) {
-      
-
-      if(packet.keycode[0] == 0 && packet.keycode[1] == 0 && packet.modifiers == 0){
-        continue;
-      }
-      else{
-        if( packet.modifiers != 0 && packet.keycode[0] == 0){
-          continue;
-        }
-        else if( packet.keycode[0] != 0 && packet.keycode[1] != 0){
-          while (packet.keycode[0] != 0){
-            if(packet.keycode[1] != 0){
-              key = usbkey_to_ascii(packet.keycode[1], packet.modifiers);
-              break;
-              
-            }
-            else{
-              continue;
-            }
-          }
-
-        }
-        else{
-        key = usbkey_to_ascii(packet.keycode[0], packet.modifiers);
-        }
-      }
-
-      /////////////////////////////////////////////
-        // if(key != 0){
-        //   if(input_index < BUFFER_SIZE -1){  // leave space for '\0'.. What's that?
-        //     input_buffer[input_index++] = key;
-        //     input_buffer[input_index] = '\0';
-        //   }
-
-        // }
-
-        if (key != 0) {                     //If key pressed  hello 
-
-          if (key == '\b') { // BACKSPACE
-              // Backspace: Remove the character before the cursor, if any.
-              if (cursor_position > 0) {
-                  // Shift left all characters from cursor_position to the end.
-                  for (int i = cursor_position - 1; i < input_index - 1; i++) {
-                      input_buffer[i] = input_buffer[i + 1];
-                  }
-                  input_index--;
-                  cursor_position--;  // Move the cursor back one position
-                  input_buffer[input_index] = '\0';  // Maintain null termination
-              }
-          } 
-
-          else if (key == '\n') { // Enter
-
-            write(sockfd, input_buffer, strlen(input_buffer));
-
-             // Clear the input area (both rows)
-              for (col = 0; col < MAX_COLS; col++) {
-                fbputchar(' ', INPUT_FIRST_ROW, col);
-                fbputchar(' ', INPUT_SECOND_ROW, col);
-               }
-
-               // Reset buffer and positions
-
-              input_index = 0;
-              cursor_position = 0;
-              input_buffer[0] = '\0';
-            }
-
-            else if (key == -2){ //LEFT key
-              if(cursor_position>0){
-                cursor_position--;
-              }
-              /////////////////////////
-              for (col = 0; col < MAX_COLS; col++) {
-                fbputchar(' ', INPUT_FIRST_ROW, col);
-                fbputchar(' ', INPUT_SECOND_ROW, col);
-            }
-
-            if (input_index < MAX_COLS) {
-                // If the input fits on the first row, display it there
-                fbputs(input_buffer, INPUT_FIRST_ROW, 0);
-                // Display the cursor at the next column on the first row
-                fbputchar(CURSOR_CHAR, INPUT_FIRST_ROW, cursor_position);
-            } else {
-                // If the input exceeds one row, split it:
-                // Display the first MAX_COLS characters on the first row
-                fbputs(input_buffer, INPUT_FIRST_ROW, 0);
-                // Display the remaining characters on the second row
-                fbputs(input_buffer + MAX_COLS, INPUT_SECOND_ROW, 0);
-                // Display the cursor on the second row at position (input_index - MAX_COLS)
-                fbputchar(CURSOR_CHAR, INPUT_SECOND_ROW, cursor_position - MAX_COLS);
-            }
-              ///////////////////////////
-              continue;
-            }
-
-            else if (key == -3){ //RIGHT key
-              if(cursor_position<input_index){
-                cursor_position++;
-              }
-              /////////////////////////
-              for (col = 0; col < MAX_COLS; col++) {
-                fbputchar(' ', INPUT_FIRST_ROW, col);
-                fbputchar(' ', INPUT_SECOND_ROW, col);
-            }
-
-            if (input_index < MAX_COLS) {
-                // If the input fits on the first row, display it there
-                fbputs(input_buffer, INPUT_FIRST_ROW, 0);
-                // Display the cursor at the next column on the first row
-                fbputchar(CURSOR_CHAR, INPUT_FIRST_ROW, cursor_position);
-            } else {
-                // If the input exceeds one row, split it:
-                // Display the first MAX_COLS characters on the first row
-                fbputs(input_buffer, INPUT_FIRST_ROW, 0);
-                // Display the remaining characters on the second row
-                fbputs(input_buffer + MAX_COLS, INPUT_SECOND_ROW, 0);
-                // Display the cursor on the second row at position (input_index - MAX_COLS)
-                fbputchar(CURSOR_CHAR, INPUT_SECOND_ROW, cursor_position - MAX_COLS);
-            }
-              ///////////////////////////
-              continue;
-            }
-
-          else {
-              // Insert the character at the current cursor position
-              if (input_index < BUFFER_SIZE - 1) {  // Leave room for '\0'
-                  // Shift characters to the right, starting at the current cursor position
-                  for (int i = input_index; i > cursor_position; i--) {
-                      input_buffer[i] = input_buffer[i - 1];
-                  }
-                  input_buffer[cursor_position] = key;  // Insert the new key
-                  input_index++;
-                  cursor_position++;  // Advance the cursor position
-                  input_buffer[input_index] = '\0';  // Update null termination
-              }
-          }
-      }
-
-
-
-    //    for (col = 0; col < 64; col++) {
-    //      fbputchar(' ', INPUT_ROW, col);
-    //  }
-      ////////////////////////////////////////////
-
-      printf("%02x %02x %02x", packet.modifiers, packet.keycode[0],packet.keycode[1]);
-     // printf("%s\n", keystate);
-    //  printf("%c\n", key);  //Current
-
-    //printf("Key: %c, Buffer: \"%s\"\n", key, input_buffer);
-      ///////////////////////////////////////
-      for (col = 0; col < MAX_COLS; col++) {
-        fbputchar(' ', INPUT_FIRST_ROW, col);
-        fbputchar(' ', INPUT_SECOND_ROW, col);
-    }
-
-    if (input_index < MAX_COLS) {
-        // If the input fits on the first row, display it there
-        fbputs(input_buffer, INPUT_FIRST_ROW, 0);
-        // Display the cursor at the next column on the first row
-        fbputchar(CURSOR_CHAR, INPUT_FIRST_ROW, cursor_position);
-    } else {
-        // If the input exceeds one row, split it:
-        // Display the first MAX_COLS characters on the first row
-        fbputs(input_buffer, INPUT_FIRST_ROW, 0);
-        // Display the remaining characters on the second row
-        fbputs(input_buffer + MAX_COLS, INPUT_SECOND_ROW, 0);
-        // Display the cursor on the second row at position (input_index - MAX_COLS)
-        fbputchar(CURSOR_CHAR, INPUT_SECOND_ROW, cursor_position - MAX_COLS);
-    }
-      ///////////////////////////////////////
-      ///////
-      //fbputs(input_buffer, INPUT_ROW, 0);
-      //fbputchar('|', INPUT_ROW, input_index);
-      //fbputchar(key, 21, 0); //Current
-    //  fbputs(keystate, 21, 0);     //TYPES at Row 21?
+      sprintf(keystate, "%02x %02x %02x", packet.modifiers, packet.keycode[0],
+	      packet.keycode[1]);
+      printf("%s\n", keystate);
+      fbputs(keystate, 21, 0);     //TYPES at Row 21?
       if (packet.keycode[0] == 0x29) { /* ESC pressed? */
 	break;
       }
@@ -333,6 +140,7 @@ void *network_thread_f(void *ignored)
   char recvBuf[BUFFER_SIZE];
   int n;
   /////////////////////
+  int rows, cols;
   int rows, col;
 int rws = 1;
   ////////////////////
@@ -341,10 +149,9 @@ int rws = 1;
     recvBuf[n] = '\0';
     printf("%s", recvBuf);
     fbputs(recvBuf, rws, 0);
-    rws++;
-    ////////////////////////////// clear and scroll to top and clear the recieve screen
-    if(rws > 19){
-      for (rows = 1 ; rows < 20 ; rows++){
+    //////////////////////////////
+    if(rws > 20){
+      for (rows = 0 ; rows < 21 ; rows++){
          for (col = 0 ; col < 64 ; col++) {
            fbputchar(' ', rows, col);
          }
@@ -356,90 +163,4 @@ int rws = 1;
   }
 
   return NULL;
-}
-
-/////////////////////////////////////////////////////////////////// handling ASCII    CCVVVVVVVVVVVVVVVVVVVVVVVVVVVVVDDDDDDWWWWWWWWWWWWWWWrvfspace ships
-
-int usbkey_to_ascii(uint8_t keycode, uint8_t modifiers)
-{
-    // Letters: keycodes 0x04 to 0x1d represent 'a' to 'z'
-    if (keycode >= 0x04 && keycode <= 0x1d) {
-        if (modifiers & (USB_LSHIFT | USB_RSHIFT))
-            return 'A' + (keycode - 0x04);
-        else
-            return 'a' + (keycode - 0x04);
-    }
-
-    // Digits: keycodes 0x1e to 0x27 represent '1'-'9' and '0'
-    if (keycode >= 0x1e && keycode <= 0x27) {
-        if (modifiers & (USB_LSHIFT | USB_RSHIFT)) {
-            // When shifted, map to symbols
-            const char shifted_digits[] = {'!', '@', '#', '$', '%', '^', '&', '*', '(', ')'};
-            return shifted_digits[keycode - 0x1e];
-        } else {
-            // Not shifted: map normally
-            if (keycode == 0x27)
-                return '0';
-            else
-                return '1' + (keycode - 0x1e);
-        }
-    }
-
-    // Space: keycode 0x2c
-    if (keycode == 0x2c)
-        return ' ';
-
-    // Punctuation and symbols:
-    if (keycode == 0x2d) {  // '-' or '_'
-        return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? '_' : '-';
-    }
-    if (keycode == 0x2e) {  // '=' or '+'
-        return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? '+' : '=';
-    }
-    if (keycode == 0x2f) {  // '[' or '{'
-        return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? '{' : '[';
-    }
-    if (keycode == 0x30) {  // ']' or '}'
-        return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? '}' : ']';
-    }
-    if (keycode == 0x31) {  // '\' or '|'
-        return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? '|' : '\\';
-    }
-    if (keycode == 0x33) {  // ';' or ':'
-        return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? ':' : ';';
-    }
-    if (keycode == 0x34) {  // '\'' or '"'
-        return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? '"' : '\'';
-    }
-    if (keycode == 0x35) {  // '`' or '~'
-        return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? '~' : '`';
-    }
-    if (keycode == 0x36) {  // ',' or '<'
-        return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? '<' : ',';
-    }
-    if (keycode == 0x37) {  // '.' or '>'
-        return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? '>' : '.';
-    }
-    if (keycode == 0x38) {  // '/' or '?'
-        return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? '?' : '/';
-    }
-
-    // Backspace: keycode 0x2a
-    if (keycode == 0x2a){
-      return '\b';
-    }
-    // Enter: keycode 0x28
-    if (keycode == 0x28){
-      return '\n';
-    }
-    // Left key
-    if (keycode == 0x50){
-      return LEFT_KEY;
-    }
-    //Right key
-    if (keycode == 0x4f){
-      return RIGHT_KEY;
-    }
-    // For keys not mapped here, return 0.
-    return 0;
 }
