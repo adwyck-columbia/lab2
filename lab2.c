@@ -65,7 +65,7 @@ int main()
 
   int cursor_col = 0;
 
-  static int key_pressed = 0;
+  static int key_processed = 0;
   ////////////////////
 
   struct sockaddr_in serv_addr;
@@ -150,7 +150,7 @@ fbclear(0,0,0);
       }
       if (is_empty && packet.modifiers == 0) {
           // No key is pressed: reset our flag
-          int key_processed = 0;
+           key_processed = 0;
           continue;
       }
 
