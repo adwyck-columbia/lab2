@@ -243,7 +243,7 @@ fbclear(0,0,0);
         // If the input fits on the first row, display it there
         fbputs(input_buffer, INPUT_FIRST_ROW, 0);
         // Display the cursor at the next column on the first row
-        fbputchar(CURSOR_CHAR, INPUT_FIRST_ROW, input_index);
+        fbputchar(CURSOR_CHAR, INPUT_FIRST_ROW, cursor_position);
     } else {
         // If the input exceeds one row, split it:
         // Display the first MAX_COLS characters on the first row
@@ -251,7 +251,7 @@ fbclear(0,0,0);
         // Display the remaining characters on the second row
         fbputs(input_buffer + MAX_COLS, INPUT_SECOND_ROW, 0);
         // Display the cursor on the second row at position (input_index - MAX_COLS)
-        fbputchar(CURSOR_CHAR, INPUT_SECOND_ROW, input_index - MAX_COLS);
+        fbputchar(CURSOR_CHAR, INPUT_SECOND_ROW, cursor_position - MAX_COLS);
     }
       ///////////////////////////////////////
       ///////
