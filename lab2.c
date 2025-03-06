@@ -150,7 +150,7 @@ fbclear(0,0,0);
       }
       if (is_empty && packet.modifiers == 0) {
           // No key is pressed: reset our flag
-          key_processed = 0;
+          int key_processed = 0;
           continue;
       }
 
