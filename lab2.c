@@ -57,7 +57,7 @@ int main()
 
   /////////////////////added variable
   int rows;
-  char key;
+  int key;
 
   char input_buffer[BUFFER_SIZE];
   int input_index = 0;
@@ -306,7 +306,7 @@ int rws = 1;
 
 /////////////////////////////////////////////////////////////////// handling ASCII    CCVVVVVVVVVVVVVVVVVVVVVVVVVVVVVDDDDDDWWWWWWWWWWWWWWWrvfspace ships
 
-char usbkey_to_ascii(uint8_t keycode, uint8_t modifiers)
+int usbkey_to_ascii(uint8_t keycode, uint8_t modifiers)
 {
     // Letters: keycodes 0x04 to 0x1d represent 'a' to 'z'
     if (keycode >= 0x04 && keycode <= 0x1d) {

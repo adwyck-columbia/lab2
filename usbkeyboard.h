@@ -16,7 +16,7 @@
 #define USB_RGUI   (1 << 7)
 
 //////////////////////////
-char usbkey_to_ascii(uint8_t keycode, uint8_t modifiers);
+int usbkey_to_ascii(uint8_t keycode, uint8_t modifiers);
 
 //////////////////////////
 
