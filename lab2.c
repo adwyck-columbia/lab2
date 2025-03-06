@@ -31,8 +31,8 @@
 #define MAX_COLS 64
 #define CURSOR_CHAR '|'
 
-#define LEFT_KEY -1
-#define RIGHT_KEY -2
+#define LEFT_KEY -2
+#define RIGHT_KEY -3
 
 /*
  * References:
@@ -192,16 +192,18 @@ fbclear(0,0,0);
               input_buffer[0] = '\0';
             }
 
-            else if (key == -1){ //LEFT key
+            else if (key == -2){ //LEFT key
               if(cursor_position>0){
                 cursor_position--;
               }
+              continue;
             }
 
-            else if (key == -2){ //RIGHT key
+            else if (key == -3){ //RIGHT key
               if(cursor_position<input_index){
                 cursor_position++;
               }
+              continue;
             }
 
           else {
