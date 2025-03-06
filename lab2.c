@@ -134,217 +134,94 @@ fbclear(0,0,0);
   /* Look for and handle keypresses */
   input_buffer[0] = '\0';
 
+  uint8_t prev_keycodes[2] = {0, 0};
+
   for (;;) {
     libusb_interrupt_transfer(keyboard, endpoint_address,
-            (unsigned char *) &packet, sizeof(packet),
-            &transferred, 0);
+                              (unsigned char *) &packet, sizeof(packet),
+                              &transferred, 0);
+
     if (transferred == sizeof(packet)) {
-      
 
-      // if(packet.keycode[0] == 0 && packet.keycode[1] == 0 && packet.modifiers == 0){
-      //   continue;
-      // }
-      // else{
-      //   if( packet.modifiers != 0 && packet.keycode[0] == 0){
-      //     continue;
-      //   }
-      //   else if( packet.keycode[0] != 0 && packet.keycode[1] != 0){
-      //     while (packet.keycode[0] != 0){
-      //       if(packet.keycode[1] != 0){
-      //         key = usbkey_to_ascii(packet.keycode[1], packet.modifiers);
-      //         break;
-              
-      //       }
-      //       else{
-      //         continue;
-      //       }
-      //     }
+        // No keys pressed, update previous and skip
+        if (packet.keycode[0] == 0 && packet.keycode[1] == 0) {
+            prev_keycodes[0] = prev_keycodes[1] = 0;
+            continue;
+        }
 
-      //   }
-      //   else{
-      //   key = usbkey_to_ascii(packet.keycode[0], packet.modifiers);
-      //   }
-      // }
+        int key_handled = 0;
+        for (int i = 0; i < 2; i++) {
+            uint8_t current_keycode = packet.keycode[i];
 
-         // If no keys pressed, reset current_key_pressed
-         if (packet.keycode[0] == 0 && packet.keycode[1] == 0) {
-          current_key_pressed = 0;
-          continue;
-      }
+            if (current_keycode == 0) continue;
 
-      int new_key = 0;
+            // Check if this key was already pressed previously
+            int already_pressed = (current_keycode == prev_keycodes[0]) ||
+                                  (current_keycode == prev_keycodes[1]);
 
-      // Always prioritize latest key pressed
-      if (packet.keycode[1] != 0) {
-          new_key = usbkey_to_ascii(packet.keycode[1], packet.modifiers);
-      } else if (packet.keycode[0] != 0) {
-          new_key = usbkey_to_ascii(packet.keycode[0], packet.modifiers);
-      }
+            if (!already_pressed && !key_handled) {
+                key = usbkey_to_ascii(current_keycode, packet.modifiers);
 
+                if (key != 0) {  // Valid ASCII key
+                    if (key == '\b') {
+                        if (cursor_position > 0) {
+                            for (int j = cursor_position - 1; j < input_index - 1; j++)
+                                input_buffer[j] = input_buffer[j + 1];
+                            input_index--;
+                            cursor_position--;
+                            input_buffer[input_index] = '\0';
+                        }
+                    } 
+                    else if (key == '\n') {
+                        write(sockfd, input_buffer, strlen(input_buffer));
+                        memset(input_buffer, 0, BUFFER_SIZE);
+                        input_index = cursor_position = 0;
+                    }
+                    else if (key == LEFT_KEY) {
+                        if (cursor_position > 0) cursor_position--;
+                    }
+                    else if (key == RIGHT_KEY) {
+                        if (cursor_position < input_index) cursor_position++;
+                    }
+                    else {
+                        if (input_index < BUFFER_SIZE - 1) {
+                            for (int j = input_index; j > cursor_position; j--)
+                                input_buffer[j] = input_buffer[j - 1];
+                            input_buffer[cursor_position++] = key;
+                            input_index++;
+                            input_buffer[input_index] = '\0';
+                        }
+                    }
 
-      if (new_key != current_key_pressed) {
-        current_key_pressed = new_key;  // Set the new key pressed
-    } else {
-        // If the key is the same and continuously held down, skip processing
-        continue;
+                    key_handled = 1;  // Prevent handling multiple keys at once
+                }
+            }
+        }
+
+        // Update previous keys state at the end
+        prev_keycodes[0] = packet.keycode[0];
+        prev_keycodes[1] = packet.keycode[1];
+
+        // Redraw screen each time
+        for (col = 0; col < MAX_COLS; col++) {
+            fbputchar(' ', INPUT_FIRST_ROW, col);
+            fbputchar(' ', INPUT_SECOND_ROW, col);
+        }
+
+        if (input_index < MAX_COLS) {
+            fbputs(input_buffer, INPUT_FIRST_ROW, 0);
+            fbputchar(CURSOR_CHAR, INPUT_FIRST_ROW, cursor_position);
+        } else {
+            fbputs(input_buffer, INPUT_FIRST_ROW, 0);
+            fbputs(input_buffer + MAX_COLS, INPUT_SECOND_ROW, 0);
+            fbputchar(CURSOR_CHAR, INPUT_SECOND_ROW, cursor_position - MAX_COLS);
+        }
+
+        if (packet.keycode[0] == 0x29) { /* ESC pressed? */
+            break;
+        }
     }
-
-    key = current_key_pressed;
-
-      /////////////////////////////////////////////
-        // if(key != 0){
-        //   if(input_index < BUFFER_SIZE -1){  // leave space for '\0'.. What's that?
-        //     input_buffer[input_index++] = key;
-        //     input_buffer[input_index] = '\0';
-        //   }
-
-        // }
-
-      //  if (key != 0) {                     //If key pressed  hello 
-
-          if (key == '\b') { // BACKSPACE
-              // Backspace: Remove the character before the cursor, if any.
-              if (cursor_position > 0) {
-                  // Shift left all characters from cursor_position to the end.
-                  for (int i = cursor_position - 1; i < input_index - 1; i++) {
-                      input_buffer[i] = input_buffer[i + 1];
-                  }
-                  input_index--;
-                  cursor_position--;  // Move the cursor back one position
-                  input_buffer[input_index] = '\0';  // Maintain null termination
-              }
-          } 
-
-          else if (key == '\n') { // Enter
-
-            write(sockfd, input_buffer, strlen(input_buffer));
-
-             // Clear the input area (both rows)
-              for (col = 0; col < MAX_COLS; col++) {
-                fbputchar(' ', INPUT_FIRST_ROW, col);
-                fbputchar(' ', INPUT_SECOND_ROW, col);
-               }
-
-               // Reset buffer and positions
-
-              input_index = 0;
-              cursor_position = 0;
-              input_buffer[0] = '\0';
-            }
-
-            else if (key == -2){ //LEFT key
-              if(cursor_position>0){
-                cursor_position--;
-              }
-              /////////////////////////
-              for (col = 0; col < MAX_COLS; col++) {
-                fbputchar(' ', INPUT_FIRST_ROW, col);
-                fbputchar(' ', INPUT_SECOND_ROW, col);
-            }
-
-            if (input_index < MAX_COLS) {
-                // If the input fits on the first row, display it there
-                fbputs(input_buffer, INPUT_FIRST_ROW, 0);
-                // Display the cursor at the next column on the first row
-                fbputchar(CURSOR_CHAR, INPUT_FIRST_ROW, cursor_position);
-            } else {
-                // If the input exceeds one row, split it:
-                // Display the first MAX_COLS characters on the first row
-                fbputs(input_buffer, INPUT_FIRST_ROW, 0);
-                // Display the remaining characters on the second row
-                fbputs(input_buffer + MAX_COLS, INPUT_SECOND_ROW, 0);
-                // Display the cursor on the second row at position (input_index - MAX_COLS)
-                fbputchar(CURSOR_CHAR, INPUT_SECOND_ROW, cursor_position - MAX_COLS);
-            }
-              ///////////////////////////
-              continue;
-            }
-
-            else if (key == -3){ //RIGHT key
-              if(cursor_position<input_index){
-                cursor_position++;
-              }
-              /////////////////////////
-              for (col = 0; col < MAX_COLS; col++) {
-                fbputchar(' ', INPUT_FIRST_ROW, col);
-                fbputchar(' ', INPUT_SECOND_ROW, col);
-            }
-
-            if (input_index < MAX_COLS) {
-                // If the input fits on the first row, display it there
-                fbputs(input_buffer, INPUT_FIRST_ROW, 0);
-                // Display the cursor at the next column on the first row
-                fbputchar(CURSOR_CHAR, INPUT_FIRST_ROW, cursor_position);
-            } else {
-                // If the input exceeds one row, split it:
-                // Display the first MAX_COLS characters on the first row
-                fbputs(input_buffer, INPUT_FIRST_ROW, 0);
-                // Display the remaining characters on the second row
-                fbputs(input_buffer + MAX_COLS, INPUT_SECOND_ROW, 0);
-                // Display the cursor on the second row at position (input_index - MAX_COLS)
-                fbputchar(CURSOR_CHAR, INPUT_SECOND_ROW, cursor_position - MAX_COLS);
-            }
-              ///////////////////////////
-              continue;
-            }
-
-          else {
-              // Insert the character at the current cursor position
-              if (input_index < BUFFER_SIZE - 1) {  // Leave room for '\0'
-                  // Shift characters to the right, starting at the current cursor position
-                  for (int i = input_index; i > cursor_position; i--) {
-                      input_buffer[i] = input_buffer[i - 1];
-                  }
-                  input_buffer[cursor_position] = key;  // Insert the new key
-                  input_index++;
-                  cursor_position++;  // Advance the cursor position
-                  input_buffer[input_index] = '\0';  // Update null termination
-              }
-          }
-     // }
-
-
-    //    for (col = 0; col < 64; col++) {
-    //      fbputchar(' ', INPUT_ROW, col);
-    //  }
-      ////////////////////////////////////////////
-
-    //  printf("%02x %02x %02x", packet.modifiers, packet.keycode[0],packet.keycode[1]);
-     // printf("%s\n", keystate);
-    //  printf("%c\n", key);  //Current
-
-    printf("Key: %c, Buffer: \"%s\"\n", key, input_buffer);
-      ///////////////////////////////////////
-      for (col = 0; col < MAX_COLS; col++) {
-        fbputchar(' ', INPUT_FIRST_ROW, col);
-        fbputchar(' ', INPUT_SECOND_ROW, col);
-    }
-
-    if (input_index < MAX_COLS) {
-        // If the input fits on the first row, display it there
-        fbputs(input_buffer, INPUT_FIRST_ROW, 0);
-        // Display the cursor at the next column on the first row
-        fbputchar(CURSOR_CHAR, INPUT_FIRST_ROW, cursor_position);
-    } else {
-        // If the input exceeds one row, split it:
-        // Display the first MAX_COLS characters on the first row
-        fbputs(input_buffer, INPUT_FIRST_ROW, 0);
-        // Display the remaining characters on the second row
-        fbputs(input_buffer + MAX_COLS, INPUT_SECOND_ROW, 0);
-        // Display the cursor on the second row at position (input_index - MAX_COLS)
-        fbputchar(CURSOR_CHAR, INPUT_SECOND_ROW, cursor_position - MAX_COLS);
-    }
-      ///////////////////////////////////////
-      ///////
-      //fbputs(input_buffer, INPUT_ROW, 0);
-      //fbputchar('|', INPUT_ROW, input_index);
-      //fbputchar(key, 21, 0); //Current
-    //  fbputs(keystate, 21, 0);     //TYPES at Row 21?
-      if (packet.keycode[0] == 0x29) { /* ESC pressed? */
-  break;
-      }
-    }
-  }
+}
 
   /* Terminate the network thread */
   pthread_cancel(network_thread);
