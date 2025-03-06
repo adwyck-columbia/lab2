@@ -147,7 +147,7 @@ fbclear(0,0,0);
           continue;
         }
         else{
-        key = usbkey_to_ascii(packet.keycode[0], packet.modifiers);
+        key = usbkey_to_ascii(packet.keycode[0], packet.keycode[1], packet.modifiers);
         }
       }
 
