@@ -136,7 +136,7 @@ fbclear(0,0,0);
 			      (unsigned char *) &packet, sizeof(packet),
 			      &transferred, 0);
     if (transferred == sizeof(packet)) {
-     // sprintf(keystate, "%02x %02x %02x", packet.modifiers, packet.keycode[0],
+     // sprintf(keystate, "%02x %02x %02x", packet.modifiers, packet.keycode[0],   
 	   //   packet.keycode[1]);
       
       if(packet.keycode[0] == 0 && packet.keycode[1] == 0 && packet.modifiers == 0){
@@ -147,7 +147,15 @@ fbclear(0,0,0);
           continue;
         }
         else if( packet.keycode[0] != 0 && packet.keycode[1] != 0){
-          key = usbkey_to_ascii(packet.keycode[1], packet.modifiers);
+          while (packet.keycode[0] != 0){
+            if(packet.keycode[1] == 0){
+              continue;
+            }
+            else{
+              key = usbkey_to_ascii(packet.keycode[1], packet.modifiers);
+            }
+          }
+          
         }
         else{
         key = usbkey_to_ascii(packet.keycode[0], packet.modifiers);
