@@ -64,9 +64,6 @@ int main()
   int cursor_position = 0;
 
   int cursor_col = 0;
-
-static int last_processed_key = 0;
-static int release_detected = 1;
   ////////////////////
 
   struct sockaddr_in serv_addr;
@@ -135,32 +132,36 @@ fbclear(0,0,0);
   input_buffer[0] = '\0';
 
   for (;;) {
-
     libusb_interrupt_transfer(keyboard, endpoint_address,
-      (unsigned char *) &packet, sizeof(packet),
-      &transferred, 0);
+            (unsigned char *) &packet, sizeof(packet),
+            &transferred, 0);
+    if (transferred == sizeof(packet)) {
+      
 
-  if (transferred != sizeof(packet))
-  continue;
+      if(packet.keycode[0] == 0 && packet.keycode[1] == 0 && packet.modifiers == 0){
+        continue;
+      }
+      else{
+        if( packet.modifiers != 0 && packet.keycode[0] == 0){
+          continue;
+        }
+        else if( packet.keycode[0] != 0 && packet.keycode[1] != 0){
+          while (packet.keycode[0] != 0){
+            if(packet.keycode[1] != 0){
+              key = usbkey_to_ascii(packet.keycode[1], packet.modifiers);
+              break;
+              
+            }
+            else{
+              continue;
+            }
+          }
 
-  // If no key is pressed, update the release flag and reset last_processed_key.
-  if (packet.keycode[0] == 0 && packet.keycode[1] == 0 && packet.modifiers == 0) {
-  release_detected = 1;
-  last_processed_key = 0;
-  continue;
-  }
-
-  // Determine the current key value from the packet.
-  int current_key = usbkey_to_ascii(packet.keycode[0], packet.modifiers);
-
-  // If a key is being held (i.e. not released) and it's the same as last time, skip processing.
-  if (!release_detected && current_key == last_processed_key) {
-  continue;
-  }
-
-  // Otherwise, mark that a new key press has been detected.
-  release_detected = 0;
-  last_processed_key = current_key;
+        }
+        else{
+        key = usbkey_to_ascii(packet.keycode[0], packet.modifiers);
+        }
+      }
 
       /////////////////////////////////////////////
         // if(key != 0){
@@ -171,9 +172,9 @@ fbclear(0,0,0);
 
         // }
 
-        if (current_key != 0) {                     //If key pressed  hello 
+        if (key != 0) {                     //If key pressed  hello 
 
-          if (current_key == '\b') { // BACKSPACE
+          if (key == '\b') { // BACKSPACE
               // Backspace: Remove the character before the cursor, if any.
               if (cursor_position > 0) {
                   // Shift left all characters from cursor_position to the end.
@@ -186,7 +187,7 @@ fbclear(0,0,0);
               }
           } 
 
-          else if (current_key == '\n') { // Enter
+          else if (key == '\n') { // Enter
 
             write(sockfd, input_buffer, strlen(input_buffer));
 
@@ -203,7 +204,7 @@ fbclear(0,0,0);
               input_buffer[0] = '\0';
             }
 
-            else if (current_key == -2){ //LEFT key
+            else if (key == -2){ //LEFT key
               if(cursor_position>0){
                 cursor_position--;
               }
@@ -284,7 +285,7 @@ fbclear(0,0,0);
      // printf("%s\n", keystate);
     //  printf("%c\n", key);  //Current
 
-    printf("Key: %c, Buffer: \"%s\"\n", (char)current_key, input_buffer);
+    printf("Key: %c, Buffer: \"%s\"\n", key, input_buffer);
       ///////////////////////////////////////
       for (col = 0; col < MAX_COLS; col++) {
         fbputchar(' ', INPUT_FIRST_ROW, col);
@@ -315,7 +316,7 @@ fbclear(0,0,0);
   break;
       }
     }
-
+  }
 
   /* Terminate the network thread */
   pthread_cancel(network_thread);
