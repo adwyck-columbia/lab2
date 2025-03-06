@@ -64,8 +64,6 @@ int main()
   int cursor_position = 0;
 
   int cursor_col = 0;
-
-  static int key_processed = 0;
   ////////////////////
 
   struct sockaddr_in serv_addr;
@@ -140,30 +138,7 @@ fbclear(0,0,0);
     if (transferred == sizeof(packet)) {
      // sprintf(keystate, "%02x %02x %02x", packet.modifiers, packet.keycode[0],   
      //   packet.keycode[1]);
-      //////////////////////////////////////////////////
-      int is_empty = 1;
-      for (int j = 0; j < 2; j++) {
-          if (packet.keycode[j] != 0) {
-              is_empty = 0;
-              break;
-          }
-      }
-      if (is_empty && packet.modifiers == 0) {
-          // No key is pressed: reset our flag
-           key_processed = 0;
-          continue;
-      }
-
-      // If a key was already processed, ignore duplicate events
-      if (key_processed) {
-          continue;
-      }
-
-      // Otherwise, mark that we have processed this key event.
-      key_processed = 1;
-
-
-      //////////////////////////////////////////////////
+      
       if(packet.keycode[0] == 0 && packet.keycode[1] == 0 && packet.modifiers == 0){
         continue;
       }
