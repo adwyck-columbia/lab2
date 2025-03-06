@@ -31,6 +31,9 @@
 #define MAX_COLS 64
 #define CURSOR_CHAR '|'
 
+#define LEFT_KEY -1
+#define RIGHT_KEY -2
+
 /*
  * References:
  *
@@ -157,8 +160,8 @@ fbclear(0,0,0);
 
         // }
 
-        if (key != 0) {                     //If key pressed
-
+        if (key != 0) {                     //If key pressed  hello 
+                                                              123456
           if (key == '\b') { // BACKSPACE
               // Backspace: Remove the character before the cursor, if any.
               if (cursor_position > 0) {
@@ -187,6 +190,18 @@ fbclear(0,0,0);
               input_index = 0;
               cursor_position = 0;
               input_buffer[0] = '\0';
+            }
+
+            else if (key == -1){ //LEFT key
+              if(cursor_position>0){
+                cursor_position--;
+              }
+            }
+
+            else if (key == -2){ //RIGHT key
+              if(cursor_position<input_index){
+                cursor_position++;
+              }
             }
 
           else {
@@ -287,7 +302,7 @@ int rws = 1;
   return NULL;
 }
 
-/////////////////////////////////////////////////////////////////// handling ASCII
+/////////////////////////////////////////////////////////////////// handling ASCII    CCVVVVVVVVVVVVVVVVVVVVVVVVVVVVVDDDDDDWWWWWWWWWWWWWWWrvfspace ships
 
 char usbkey_to_ascii(uint8_t keycode, uint8_t modifiers)
 {
@@ -360,6 +375,14 @@ char usbkey_to_ascii(uint8_t keycode, uint8_t modifiers)
     // Enter: keycode 0x28
     if (keycode == 0x28){
       return '\n';
+    }
+    // Left key
+    if (keycode == 0x50){
+      return LEFT_KEY;
+    }
+    //Right key
+    if (keycode == 0x4f){
+      return RIGHT_KEY;
     }
     // For keys not mapped here, return 0.
     return 0;
