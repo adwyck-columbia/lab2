@@ -282,7 +282,7 @@ fbclear(0,0,0);
     //  }
       ////////////////////////////////////////////
 
-      printf(keystate, "%02x %02x %02x", packet.modifiers, packet.keycode[0],packet.keycode[1]);
+      printf("%02x %02x %02x", packet.modifiers, packet.keycode[0],packet.keycode[1]);
      // printf("%s\n", keystate);
     //  printf("%c\n", key);  //Current
 
