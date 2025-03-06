@@ -140,27 +140,27 @@ fbclear(0,0,0);
       (unsigned char *) &packet, sizeof(packet),
       &transferred, 0);
 
-if (transferred != sizeof(packet))
-continue;
+  if (transferred != sizeof(packet))
+  continue;
 
-// If no key is pressed, update the release flag and reset last_processed_key.
-if (packet.keycode[0] == 0 && packet.keycode[1] == 0 && packet.modifiers == 0) {
-release_detected = 1;
-last_processed_key = 0;
-continue;
-}
+  // If no key is pressed, update the release flag and reset last_processed_key.
+  if (packet.keycode[0] == 0 && packet.keycode[1] == 0 && packet.modifiers == 0) {
+  release_detected = 1;
+  last_processed_key = 0;
+  continue;
+  }
 
-// Determine the current key value from the packet.
-int current_key = usbkey_to_ascii(packet.keycode[0], packet.modifiers);
+  // Determine the current key value from the packet.
+  int current_key = usbkey_to_ascii(packet.keycode[0], packet.modifiers);
 
-// If a key is being held (i.e. not released) and it's the same as last time, skip processing.
-if (!release_detected && current_key == last_processed_key) {
-continue;
-}
+  // If a key is being held (i.e. not released) and it's the same as last time, skip processing.
+  if (!release_detected && current_key == last_processed_key) {
+  continue;
+  }
 
-// Otherwise, mark that a new key press has been detected.
-release_detected = 0;
-last_processed_key = current_key;
+  // Otherwise, mark that a new key press has been detected.
+  release_detected = 0;
+  last_processed_key = current_key;
 
       /////////////////////////////////////////////
         // if(key != 0){
@@ -315,7 +315,7 @@ last_processed_key = current_key;
   break;
       }
     }
-  }
+
 
   /* Terminate the network thread */
   pthread_cancel(network_thread);
