@@ -133,11 +133,11 @@ fbclear(0,0,0);
 
   for (;;) {
     libusb_interrupt_transfer(keyboard, endpoint_address,
-			      (unsigned char *) &packet, sizeof(packet),
-			      &transferred, 0);
+            (unsigned char *) &packet, sizeof(packet),
+            &transferred, 0);
     if (transferred == sizeof(packet)) {
      // sprintf(keystate, "%02x %02x %02x", packet.modifiers, packet.keycode[0],   
-	   //   packet.keycode[1]);
+     //   packet.keycode[1]);
       
       if(packet.keycode[0] == 0 && packet.keycode[1] == 0 && packet.modifiers == 0){
         continue;
@@ -146,8 +146,20 @@ fbclear(0,0,0);
         if( packet.modifiers != 0 && packet.keycode[0] == 0){
           continue;
         }
+        else if( packet.keycode[0] != 0 && packet.keycode[1] != 0){
+          while (packet.keycode[0] != 0){
+            if(packet.keycode[1] == 0){
+              continue;
+            }
+            else{
+              key = usbkey_to_ascii(packet.keycode[1], packet.modifiers);
+            }
+            break;
+          }
+          
+        }
         else{
-        key = usbkey_to_ascii(packet.keycode[0], packet.keycode[1], packet.modifiers);
+        key = usbkey_to_ascii(packet.keycode[0], packet.modifiers);
         }
       }
 
@@ -264,12 +276,10 @@ fbclear(0,0,0);
       }
 
 
-
     //    for (col = 0; col < 64; col++) {
     //      fbputchar(' ', INPUT_ROW, col);
     //  }
       ////////////////////////////////////////////
-
 
     //  printf("%s\n", keystate);
     //  printf("%c\n", key);  //Current
@@ -302,7 +312,7 @@ fbclear(0,0,0);
       //fbputchar(key, 21, 0); //Current
     //  fbputs(keystate, 21, 0);     //TYPES at Row 21?
       if (packet.keycode[0] == 0x29) { /* ESC pressed? */
-	break;
+  break;
       }
     }
   }
@@ -348,9 +358,8 @@ int rws = 1;
 
 /////////////////////////////////////////////////////////////////// handling ASCII    CCVVVVVVVVVVVVVVVVVVVVVVVVVVVVVDDDDDDWWWWWWWWWWWWWWWrvfspace ships
 
-int usbkey_to_ascii(uint8_t keycode, uint8_t keycode_2, uint8_t modifiers)
+int usbkey_to_ascii(uint8_t keycode, uint8_t modifiers)
 {
-    if(keycode_2 == 0){
     // Letters: keycodes 0x04 to 0x1d represent 'a' to 'z'
     if (keycode >= 0x04 && keycode <= 0x1d) {
         if (modifiers & (USB_LSHIFT | USB_RSHIFT))
@@ -432,86 +441,5 @@ int usbkey_to_ascii(uint8_t keycode, uint8_t keycode_2, uint8_t modifiers)
     // For keys not mapped here, return 0.
     return 0;
 }
-else {
-    if (keycode_2 >= 0x04 && keycode_2 <= 0x1d) {
-        if (modifiers & (USB_LSHIFT | USB_RSHIFT))
-            return 'A' + (keycode_2 - 0x04);
-        else
-            return 'a' + (keycode_2 - 0x04);
-    }
-
-    // Digits: keycodes 0x1e to 0x27 represent '1'-'9' and '0'
-    if (keycode_2 >= 0x1e && keycode_2 <= 0x27) {
-        if (modifiers & (USB_LSHIFT | USB_RSHIFT)) {
-            // When shifted, map to symbols
-            const char shifted_digits[] = {'!', '@', '#', '$', '%', '^', '&', '*', '(', ')'};
-            return shifted_digits[keycode_2 - 0x1e];
-        } else {
-            // Not shifted: map normally
-            if (keycode_2 == 0x27)
-                return '0';
-            else
-                return '1' + (keycode_2 - 0x1e);
-        }
-    }
-
-    // Space: keycode_2 0x2c
-    if (keycode_2 == 0x2c)
-        return ' ';
-
-    // Punctuation and symbols:
-    if (keycode_2 == 0x2d) {  // '-' or '_'
-        return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? '_' : '-';
-    }
-    if (keycode_2 == 0x2e) {  // '=' or '+'
-        return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? '+' : '=';
-    }
-    if (keycode_2 == 0x2f) {  // '[' or '{'
-        return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? '{' : '[';
-    }
-    if (keycode_2 == 0x30) {  // ']' or '}'
-        return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? '}' : ']';
-    }
-    if (keycode_2 == 0x31) {  // '\' or '|'
-        return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? '|' : '\\';
-    }
-    if (keycode_2 == 0x33) {  // ';' or ':'
-        return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? ':' : ';';
-    }
-    if (keycode_2 == 0x34) {  // '\'' or '"'
-        return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? '"' : '\'';
-    }
-    if (keycode_2 == 0x35) {  // '`' or '~'
-        return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? '~' : '`';
-    }
-    if (keycode_2 == 0x36) {  // ',' or '<'
-        return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? '<' : ',';
-    }
-    if (keycode_2 == 0x37) {  // '.' or '>'
-        return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? '>' : '.';
-    }
-    if (keycode_2 == 0x38) {  // '/' or '?'
-        return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? '?' : '/';
-    }
-
-    // Backspace: keycode_2 0x2a
-    if (keycode_2 == 0x2a){
-      return '\b';
-    }
-    // Enter: keycode_2 0x28
-    if (keycode_2 == 0x28){
-      return '\n';
-    }
-    // Left key
-    if (keycode_2 == 0x50){
-      return LEFT_KEY;
-    }
-    //Right key
-    if (keycode_2 == 0x4f){
-      return RIGHT_KEY;
-    }
-    // For keys not mapped here, return 0.
-    return 0;
-}
-}
 ////////////////////////////////////////////////////////////////////////////////////////
+
