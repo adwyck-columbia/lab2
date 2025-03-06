@@ -79,7 +79,7 @@ int main()
 //////////Clear?
 // for (rows = 0 ; rows < 24 ; rows++){
 // for (col = 0 ; col < 64 ; col++) {
-  
+
 //   fbputchar(' ', rows, col);
 //   //fbputchar('*', 23, col);
 // }
@@ -103,7 +103,7 @@ fbclear(0,0,0);
     fprintf(stderr, "Did not find a keyboard\n");
     exit(1);
   }
-    
+
   /* Create a TCP communications socket */
   if ( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0 ) {
     fprintf(stderr, "Error: Could not create socket\n");
@@ -133,12 +133,12 @@ fbclear(0,0,0);
 
   for (;;) {
     libusb_interrupt_transfer(keyboard, endpoint_address,
-            (unsigned char *) &packet, sizeof(packet),
-            &transferred, 0);
+			      (unsigned char *) &packet, sizeof(packet),
+			      &transferred, 0);
     if (transferred == sizeof(packet)) {
      // sprintf(keystate, "%02x %02x %02x", packet.modifiers, packet.keycode[0],   
-     //   packet.keycode[1]);
-      
+	   //   packet.keycode[1]);
+
       if(packet.keycode[0] == 0 && packet.keycode[1] == 0 && packet.modifiers == 0){
         continue;
       }
@@ -153,10 +153,10 @@ fbclear(0,0,0);
             }
             else{
               key = usbkey_to_ascii(packet.keycode[1], packet.modifiers);
+              break;
             }
-            break;
           }
-          
+
         }
         else{
         key = usbkey_to_ascii(packet.keycode[0], packet.modifiers);
@@ -173,7 +173,7 @@ fbclear(0,0,0);
         // }
 
         if (key != 0) {                     //If key pressed  hello 
-                                                          
+
           if (key == '\b') { // BACKSPACE
               // Backspace: Remove the character before the cursor, if any.
               if (cursor_position > 0) {
@@ -186,9 +186,9 @@ fbclear(0,0,0);
                   input_buffer[input_index] = '\0';  // Maintain null termination
               }
           } 
-          
+
           else if (key == '\n') { // Enter
-                
+
             write(sockfd, input_buffer, strlen(input_buffer));
 
              // Clear the input area (both rows)
@@ -213,7 +213,7 @@ fbclear(0,0,0);
                 fbputchar(' ', INPUT_FIRST_ROW, col);
                 fbputchar(' ', INPUT_SECOND_ROW, col);
             }
-            
+
             if (input_index < MAX_COLS) {
                 // If the input fits on the first row, display it there
                 fbputs(input_buffer, INPUT_FIRST_ROW, 0);
@@ -241,7 +241,7 @@ fbclear(0,0,0);
                 fbputchar(' ', INPUT_FIRST_ROW, col);
                 fbputchar(' ', INPUT_SECOND_ROW, col);
             }
-            
+
             if (input_index < MAX_COLS) {
                 // If the input fits on the first row, display it there
                 fbputs(input_buffer, INPUT_FIRST_ROW, 0);
@@ -276,10 +276,12 @@ fbclear(0,0,0);
       }
 
 
+
     //    for (col = 0; col < 64; col++) {
     //      fbputchar(' ', INPUT_ROW, col);
     //  }
       ////////////////////////////////////////////
+
 
     //  printf("%s\n", keystate);
     //  printf("%c\n", key);  //Current
@@ -290,7 +292,7 @@ fbclear(0,0,0);
         fbputchar(' ', INPUT_FIRST_ROW, col);
         fbputchar(' ', INPUT_SECOND_ROW, col);
     }
-    
+
     if (input_index < MAX_COLS) {
         // If the input fits on the first row, display it there
         fbputs(input_buffer, INPUT_FIRST_ROW, 0);
@@ -312,7 +314,7 @@ fbclear(0,0,0);
       //fbputchar(key, 21, 0); //Current
     //  fbputs(keystate, 21, 0);     //TYPES at Row 21?
       if (packet.keycode[0] == 0x29) { /* ESC pressed? */
-  break;
+	break;
       }
     }
   }
@@ -441,5 +443,3 @@ int usbkey_to_ascii(uint8_t keycode, uint8_t modifiers)
     // For keys not mapped here, return 0.
     return 0;
 }
-////////////////////////////////////////////////////////////////////////////////////////
-
