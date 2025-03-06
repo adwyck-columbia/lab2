@@ -64,6 +64,9 @@ int main()
   int cursor_position = 0;
 
   int cursor_col = 0;
+
+  int current_key_pressed = 0;  // 0 means no key pressed
+
   ////////////////////
 
   struct sockaddr_in serv_addr;
@@ -138,30 +141,55 @@ fbclear(0,0,0);
     if (transferred == sizeof(packet)) {
       
 
-      if(packet.keycode[0] == 0 && packet.keycode[1] == 0 && packet.modifiers == 0){
-        continue;
-      }
-      else{
-        if( packet.modifiers != 0 && packet.keycode[0] == 0){
-          continue;
-        }
-        else if( packet.keycode[0] != 0 && packet.keycode[1] != 0){
-          while (packet.keycode[0] != 0){
-            if(packet.keycode[1] != 0){
-              key = usbkey_to_ascii(packet.keycode[1], packet.modifiers);
-              break;
+      // if(packet.keycode[0] == 0 && packet.keycode[1] == 0 && packet.modifiers == 0){
+      //   continue;
+      // }
+      // else{
+      //   if( packet.modifiers != 0 && packet.keycode[0] == 0){
+      //     continue;
+      //   }
+      //   else if( packet.keycode[0] != 0 && packet.keycode[1] != 0){
+      //     while (packet.keycode[0] != 0){
+      //       if(packet.keycode[1] != 0){
+      //         key = usbkey_to_ascii(packet.keycode[1], packet.modifiers);
+      //         break;
               
-            }
-            else{
-              continue;
-            }
-          }
+      //       }
+      //       else{
+      //         continue;
+      //       }
+      //     }
 
-        }
-        else{
-        key = usbkey_to_ascii(packet.keycode[0], packet.modifiers);
-        }
+      //   }
+      //   else{
+      //   key = usbkey_to_ascii(packet.keycode[0], packet.modifiers);
+      //   }
+      // }
+
+         // If no keys pressed, reset current_key_pressed
+         if (packet.keycode[0] == 0 && packet.keycode[1] == 0) {
+          current_key_pressed = 0;
+          continue;
       }
+
+      int new_key = 0;
+
+      // Always prioritize latest key pressed
+      if (packet.keycode[1] != 0) {
+          new_key = usbkey_to_ascii(packet.keycode[1], packet.modifiers);
+      } else if (packet.keycode[0] != 0) {
+          new_key = usbkey_to_ascii(packet.keycode[0], packet.modifiers);
+      }
+
+
+      if (new_key != current_key_pressed) {
+        current_key_pressed = new_key;  // Set the new key pressed
+    } else {
+        // If the key is the same and continuously held down, skip processing
+        continue;
+    }
+
+    key = current_key_pressed;
 
       /////////////////////////////////////////////
         // if(key != 0){
@@ -172,7 +200,7 @@ fbclear(0,0,0);
 
         // }
 
-        if (key != 0) {                     //If key pressed  hello 
+      //  if (key != 0) {                     //If key pressed  hello 
 
           if (key == '\b') { // BACKSPACE
               // Backspace: Remove the character before the cursor, if any.
@@ -273,7 +301,7 @@ fbclear(0,0,0);
                   input_buffer[input_index] = '\0';  // Update null termination
               }
           }
-      }
+     // }
 
 
     //    for (col = 0; col < 64; col++) {
