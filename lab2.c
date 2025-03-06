@@ -146,6 +146,9 @@ fbclear(0,0,0);
         if( packet.modifiers != 0 && packet.keycode[0] == 0){
           continue;
         }
+        else if( packet.keycode[0] != 0 && packet.keycode[1] != 0){
+          key = usbkey_to_ascii(packet.keycode[1], packet.modifiers);
+        }
         else{
         key = usbkey_to_ascii(packet.keycode[0], packet.modifiers);
         }
