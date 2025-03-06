@@ -161,7 +161,7 @@ fbclear(0,0,0);
         // }
 
         if (key != 0) {                     //If key pressed  hello 
-                                                              123456
+                                                          
           if (key == '\b') { // BACKSPACE
               // Backspace: Remove the character before the cursor, if any.
               if (cursor_position > 0) {
