@@ -154,6 +154,7 @@ fbclear(0,0,0);
             else{
               key = usbkey_to_ascii(packet.keycode[1], packet.modifiers);
             }
+            break;
           }
           
         }
