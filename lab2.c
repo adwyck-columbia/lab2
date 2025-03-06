@@ -196,6 +196,27 @@ fbclear(0,0,0);
               if(cursor_position>0){
                 cursor_position--;
               }
+              /////////////////////////
+              for (col = 0; col < MAX_COLS; col++) {
+                fbputchar(' ', INPUT_FIRST_ROW, col);
+                fbputchar(' ', INPUT_SECOND_ROW, col);
+            }
+            
+            if (input_index < MAX_COLS) {
+                // If the input fits on the first row, display it there
+                fbputs(input_buffer, INPUT_FIRST_ROW, 0);
+                // Display the cursor at the next column on the first row
+                fbputchar(CURSOR_CHAR, INPUT_FIRST_ROW, cursor_position);
+            } else {
+                // If the input exceeds one row, split it:
+                // Display the first MAX_COLS characters on the first row
+                fbputs(input_buffer, INPUT_FIRST_ROW, 0);
+                // Display the remaining characters on the second row
+                fbputs(input_buffer + MAX_COLS, INPUT_SECOND_ROW, 0);
+                // Display the cursor on the second row at position (input_index - MAX_COLS)
+                fbputchar(CURSOR_CHAR, INPUT_SECOND_ROW, cursor_position - MAX_COLS);
+            }
+              ///////////////////////////
               continue;
             }
 
@@ -203,6 +224,27 @@ fbclear(0,0,0);
               if(cursor_position<input_index){
                 cursor_position++;
               }
+              /////////////////////////
+              for (col = 0; col < MAX_COLS; col++) {
+                fbputchar(' ', INPUT_FIRST_ROW, col);
+                fbputchar(' ', INPUT_SECOND_ROW, col);
+            }
+            
+            if (input_index < MAX_COLS) {
+                // If the input fits on the first row, display it there
+                fbputs(input_buffer, INPUT_FIRST_ROW, 0);
+                // Display the cursor at the next column on the first row
+                fbputchar(CURSOR_CHAR, INPUT_FIRST_ROW, cursor_position);
+            } else {
+                // If the input exceeds one row, split it:
+                // Display the first MAX_COLS characters on the first row
+                fbputs(input_buffer, INPUT_FIRST_ROW, 0);
+                // Display the remaining characters on the second row
+                fbputs(input_buffer + MAX_COLS, INPUT_SECOND_ROW, 0);
+                // Display the cursor on the second row at position (input_index - MAX_COLS)
+                fbputchar(CURSOR_CHAR, INPUT_SECOND_ROW, cursor_position - MAX_COLS);
+            }
+              ///////////////////////////
               continue;
             }
 
