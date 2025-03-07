@@ -208,15 +208,21 @@ fbclear(0,0,0);
             fbputchar(' ', INPUT_SECOND_ROW, col);
         }
 
-        if (input_index < MAX_COLS) {
+        if (input_index <= MAX_COLS) {
             fbputs(input_buffer, INPUT_FIRST_ROW, 0);
-            fbputchar(CURSOR_CHAR, INPUT_FIRST_ROW, cursor_position);
+            //fbputchar(CURSOR_CHAR, INPUT_FIRST_ROW, cursor_position);
         } else {
             fbputs(input_buffer, INPUT_FIRST_ROW, 0);
             fbputs(input_buffer + MAX_COLS, INPUT_SECOND_ROW, 0);
+            //fbputchar(CURSOR_CHAR, INPUT_SECOND_ROW, cursor_position - MAX_COLS);
+        }
+///////////
+        if (cursor_position < MAX_COLS) {
+            fbputchar(CURSOR_CHAR, INPUT_FIRST_ROW, cursor_position);
+        } else {
             fbputchar(CURSOR_CHAR, INPUT_SECOND_ROW, cursor_position - MAX_COLS);
         }
-
+////////////
         if (packet.keycode[0] == 0x29) { /* ESC pressed? */
             break;
         }
