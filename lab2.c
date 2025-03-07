@@ -244,7 +244,7 @@ int rws = 1;
   while ( (n = read(sockfd, &recvBuf, BUFFER_SIZE - 1)) > 0 ) {
     recvBuf[n] = '\0';
     printf("%s", recvBuf);
-    fbputs(recvBuf, rws, 0);
+    fbputs(recvBuf, rws, 20); //0
     rws++;
     ////////////////////////////// clear and scroll to top and clear the recieve screen
     if(rws > 19){
