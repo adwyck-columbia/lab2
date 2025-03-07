@@ -244,8 +244,26 @@ int rws = 1;
   while ( (n = read(sockfd, &recvBuf, BUFFER_SIZE - 1)) > 0 ) {
     recvBuf[n] = '\0';
     printf("%s", recvBuf);
-    fbputs(recvBuf, rws, 0); //0
-    rws++;
+
+    int recv_len = strlen(recvBuf);
+    int start_col = 0;
+
+    if (recv_len <= MAX_COLS) {
+        fbputs(recvBuf, rws, 0);
+        rws++;
+    } else {
+        // First part fits exactly MAX_COLS characters
+        char temp[MAX_COLS + 1];
+        strncpy(temp, recvBuf, MAX_COLS);
+        temp[MAX_COLS] = '\0';
+        fbputs(temp, rws, 0);
+        rws++;
+
+        // Remaining message goes to next line
+        fbputs(recvBuf + MAX_COLS, rws, 0);
+        rws++;
+    }
+
     ////////////////////////////// clear and scroll to top and clear the recieve screen
     if(rws > 19){
       for (rows = 1 ; rows < 20 ; rows++){
